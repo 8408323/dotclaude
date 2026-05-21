@@ -216,6 +216,7 @@ def main() -> int:
     ap.add_argument("--no-github", action="store_true", help="skip .github workflow templates")
     ap.add_argument("--no-rules", action="store_true", help="skip .claude/rules base files")
     ap.add_argument("--no-copilot", action="store_true", help="skip generating Copilot instructions")
+    ap.add_argument("--no-claude", action="store_true", help="skip the CLAUDE.md block (for projects that hand-manage CLAUDE.md)")
     args = ap.parse_args()
 
     root = Path(args.project or os.environ.get("CLAUDE_PROJECT_DIR") or os.getcwd()).resolve()
@@ -234,10 +235,11 @@ def main() -> int:
 
     sync_settings(tpl / "settings.base.json", root / ".claude" / "settings.json", root, rep, args.dry_run)
     sync_managed_file(tpl / "AGENTS.md", root / "AGENTS.md", root, rep, args.dry_run)
-    sync_block(
-        (tpl / "CLAUDE.block.md").read_text(), root / "CLAUDE.md",
-        BLOCK_BEGIN, BLOCK_END, root, rep, args.dry_run,
-    )
+    if not args.no_claude:
+        sync_block(
+            (tpl / "CLAUDE.block.md").read_text(), root / "CLAUDE.md",
+            BLOCK_BEGIN, BLOCK_END, root, rep, args.dry_run,
+        )
 
     # Project plans are local working docs — keep them out of git.
     sync_block(
