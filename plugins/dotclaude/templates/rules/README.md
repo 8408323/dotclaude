@@ -10,7 +10,7 @@ These `.md` files are the **base rules** scaffolded into your project by `/dotcl
 
 Files carrying a `dotclaude:managed` marker (an HTML comment right after the frontmatter) are owned by the dotclaude base. `/dotclaude:init` overwrites them on update. To take local ownership of one, **delete its marker line** — dotclaude will then leave it alone. Any rule file you add without a marker is yours and is never touched.
 
-The base ships: `code-quality` + `testing` (always-on), and `security`, `error-handling`, `frontend`, `database` (path-scoped). Delete the ones that don't fit your stack, or adjust their `paths:` globs.
+The base ships: `code-quality` + `testing` + `pr-review` (always-on), and `security`, `error-handling`, `frontend`, `database` (path-scoped). Delete the ones that don't fit your stack, or adjust their `paths:` globs. Always-on rules also generate the repo-wide `.github/copilot-instructions.md`, so the PR review discipline applies to Copilot too.
 
 ## Adding your own
 
