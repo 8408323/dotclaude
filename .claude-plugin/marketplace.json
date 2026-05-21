@@ -6,13 +6,12 @@
     "email": "carl.falk@parix.se"
   },
   "metadata": {
-    "description": "Reusable Claude Code engine: guardrail hooks, reviewer agents, and workflow skills, plus an init skill that scaffolds the project-local config layer.",
-    "pluginRoot": "./plugins"
+    "description": "Reusable Claude Code engine: guardrail hooks, reviewer agents, and workflow skills, plus an init skill that scaffolds the project-local config layer."
   },
   "plugins": [
     {
       "name": "dotclaude",
-      "source": "dotclaude",
+      "source": "./plugins/dotclaude",
       "description": "Guardrail hooks, reviewer subagents, workflow skills, and /dotclaude:init to scaffold rules, settings, CLAUDE.md, and GitHub AI-review workflows into a project.",
       "author": {
         "name": "Carl Falk"
