@@ -17,6 +17,10 @@ allowed-tools:
   - Bash(git branch *)
   - Bash(gh pr create *)
   - Bash(gh pr view *)
+  - Bash(gh pr comment *)
+  - Bash(gh pr checks *)
+  - Bash(gh api *)
+  - Bash(gh pr merge *)
 ---
 
 Ship the current changes through commit, push, and PR creation. Confirm with the user before each step using the AskUserQuestion tool.
@@ -64,6 +68,19 @@ Ship the current changes through commit, push, and PR creation. Confirm with the
 - **ASK the user to confirm or edit** the title and body
 - Only after confirmation: create the PR with `gh pr create`
 - Show the PR URL when done
+
+## Step 5: Review & merge discipline
+
+Follow the **PR Review Discipline** rule. Do not merge an unreviewed PR.
+
+- After the PR is open, let the reviewers run. The repo's automatic review (e.g. `claude-code-review.yml`) and any GitHub review apps post the first round.
+- When the user has you address comments: fix them, push, then **resolve each fixed thread** and request re-review in one comment mentioning every reviewer in use:
+  ```
+  gh pr comment <n> --body "Addressed the feedback — @claude review, @codex review, @codex[agent] review, @copilot review"
+  ```
+  (Resolve threads via `gh api graphql` with `resolveReviewThread`.)
+- **Before merging**, confirm every reviewer has actually responded (posted comments or stated none) and `gh pr checks` is green. If a reviewer hasn't weighed in, wait or ping it — never merge on silence.
+- Merge only on explicit user confirmation.
 
 ## Rules
 
