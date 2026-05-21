@@ -97,7 +97,40 @@ def test_generate_copilot():
         check("generated files carry managed marker", sync.MARKER in ci and sync.MARKER in inst)
 
 
+def test_split_frontmatter():
+    fields, body = sync.split_frontmatter(
+        "---\nname: ship\ndescription: Ship it\nallowed-tools:\n  - Bash\n---\n<!-- dotclaude:managed -->\n# Ship\ndo $ARGUMENTS")
+    check("scalar fields read", fields["name"] == "ship" and fields["description"] == "Ship it")
+    check("list keys + marker not in body", "allowed-tools" not in body and "dotclaude:managed" not in body and "do $ARGUMENTS" in body)
+
+
+def test_generate_copilot_prompts_and_agents():
+    with tempfile.TemporaryDirectory() as d:
+        root = Path(d)
+        rep = sync.Report()
+        skills = root / "plugin" / "skills"
+        (skills / "ship").mkdir(parents=True)
+        (skills / "ship" / "SKILL.md").write_text("---\nname: ship\ndescription: Ship changes\n---\n# Ship\nUse $ARGUMENTS to title it")
+        (skills / "context-budget").mkdir()
+        (skills / "context-budget" / "SKILL.md").write_text("---\ndescription: budget\n---\nclaude-only")
+        agents = root / "plugin" / "agents"
+        agents.mkdir(parents=True)
+        (agents / "code-reviewer.md").write_text("---\nname: code-reviewer\ndescription: Reviews code\ntools:\n  - Read\n---\nReview for bugs")
+        (agents / "README.md").write_text("# Agents")
+        sync.generate_copilot_prompts(skills, root, rep, dry=False)
+        sync.generate_copilot_agents(agents, root, rep, dry=False)
+        prompt = (root / ".github" / "prompts" / "ship.prompt.md").read_text()
+        check("prompt has agent mode + description", "mode: agent" in prompt and "Ship changes" in prompt)
+        check("prompt maps $ARGUMENTS to copilot input", "${input:args}" in prompt and "$ARGUMENTS" not in prompt)
+        check("claude-only skill skipped", not (root / ".github" / "prompts" / "context-budget.prompt.md").exists())
+        agent = (root / ".github" / "agents" / "code-reviewer.md").read_text()
+        check("agent has description + body, no claude tools frontmatter", "Reviews code" in agent and "Review for bugs" in agent and "Read" not in agent.split("\n\n")[0])
+        check("agents README skipped", not (root / ".github" / "agents" / "README.md").exists())
+        check("generated files are managed", sync.MARKER in prompt and sync.MARKER in agent)
+
+
 for fn in [test_merge_json, test_is_managed, test_managed_overwrite_and_ownership,
-           test_block_replace, test_parse_rule, test_generate_copilot]:
+           test_block_replace, test_parse_rule, test_generate_copilot,
+           test_split_frontmatter, test_generate_copilot_prompts_and_agents]:
     fn()
 print(f"OK — {passed} checks passed")

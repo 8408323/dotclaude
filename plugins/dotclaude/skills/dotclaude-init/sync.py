@@ -209,6 +209,66 @@ def generate_copilot(rules_dir: Path, header_tpl: Path, root: Path, rep: Report,
         write_managed(root / ".github" / "instructions" / f"{name}.instructions.md", gen, root, rep, dry)
 
 
+# Skills that are Claude-Code-specific and don't translate to a Copilot prompt.
+SKILL_PROMPT_SKIP = {"context-budget", "dotclaude-init"}
+
+
+def split_frontmatter(text: str):
+    """Return ({key: value}, body) for a markdown file with simple `key: value` frontmatter.
+
+    Only top-level scalar keys are read (enough for `description`/`name`); the
+    dotclaude:managed marker is stripped from the body.
+    """
+    fields: dict[str, str] = {}
+    body = text
+    if text.startswith("---"):
+        end = text.find("\n---", 3)
+        if end != -1:
+            for line in text[3:end].splitlines():
+                if ":" in line and not line[:1].isspace() and not line.startswith("-"):
+                    k, _, v = line.partition(":")
+                    fields[k.strip()] = v.strip().strip("\"'")
+            body = text[end + 4:].lstrip("\n")
+    body = "\n".join(ln for ln in body.splitlines() if MARKER not in ln).strip("\n")
+    return fields, body
+
+
+def _derived_marker(source: str) -> str:
+    return (f"<!-- {MARKER} — generated from the dotclaude {source} by /dotclaude:init. "
+            f"Edit the source in the dotclaude repo, not this file. -->")
+
+
+def generate_copilot_prompts(skills_dir: Path, root: Path, rep: Report, dry: bool) -> None:
+    """Emit .github/prompts/<name>.prompt.md from the plugin's workflow skills."""
+    if not skills_dir.is_dir():
+        return
+    for d in sorted(p for p in skills_dir.iterdir() if p.is_dir()):
+        skill = d / "SKILL.md"
+        if not skill.exists() or d.name in SKILL_PROMPT_SKIP:
+            continue
+        fields, body = split_frontmatter(skill.read_text())
+        desc = fields.get("description", d.name)
+        body = body.replace("$ARGUMENTS", "${input:args}")
+        out = (f"---\nmode: agent\ndescription: {json.dumps(desc)}\n---\n"
+               f"{_derived_marker(d.name + ' skill')}\n\n{body}\n")
+        write_managed(root / ".github" / "prompts" / f"{d.name}.prompt.md", out, root, rep, dry)
+
+
+def generate_copilot_agents(agents_dir: Path, root: Path, rep: Report, dry: bool) -> None:
+    """Emit .github/agents/<name>.md from the plugin's reviewer agents."""
+    if not agents_dir.is_dir():
+        return
+    for f in sorted(agents_dir.glob("*.md")):
+        if f.name == "README.md":
+            continue
+        fields, body = split_frontmatter(f.read_text())
+        desc = fields.get("description", f.stem)
+        # Drop Claude tool names; Copilot custom agents use their own tool set (default if omitted).
+        out = (f"---\ndescription: {json.dumps(desc)}\n---\n"
+               f"{_derived_marker(f.stem + ' agent')}\n\n{body}\n")
+        write_managed(root / ".github" / "agents" / f"{f.stem}.md", out, root, rep, dry)
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description="Sync the dotclaude project-local layer.")
     ap.add_argument("--project", default=None, help="target project root (default: $CLAUDE_PROJECT_DIR or cwd)")
@@ -247,12 +307,15 @@ def main() -> int:
         root / ".gitignore", "# dotclaude:begin", "# dotclaude:end", root, rep, args.dry_run,
     )
 
-    # Copilot instructions, generated from the (just-synced) Claude rules.
+    # Copilot layer, generated from the Claude rules / skills / agents (single source).
     if not args.no_copilot:
+        plugin = tpl.parent  # <plugin>/templates → <plugin>
         generate_copilot(
             root / ".claude" / "rules", tpl / "github" / "copilot-instructions.header.md",
             root, rep, args.dry_run,
         )
+        generate_copilot_prompts(plugin / "skills", root, rep, args.dry_run)
+        generate_copilot_agents(plugin / "agents", root, rep, args.dry_run)
 
     if not args.no_github:
         for src in sorted((tpl / "github" / "workflows").glob("*.yml")):

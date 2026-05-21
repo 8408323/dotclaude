@@ -25,13 +25,15 @@ So dotclaude is a **hybrid**:
 
 The Claude rules and GitHub Copilot's custom instructions cover the same ground, so dotclaude **generates the Copilot files from the rules** rather than maintaining two copies that drift:
 
-| Claude (`.claude/rules/`) | Generated Copilot artifact |
+| dotclaude source | Generated Copilot artifact |
 |---|---|
 | `alwaysApply: true` rules | `.github/copilot-instructions.md` (header + concatenated bodies) |
 | `paths: [globs]` rules | `.github/instructions/<name>.instructions.md` with `applyTo: "<globs>"` |
+| plugin workflow skills | `.github/prompts/<name>.prompt.md` (`mode: agent`; Claude-only skills skipped) |
+| plugin reviewer agents | `.github/agents/<name>.md` (Copilot custom agents) |
 | (cross-tool pointer) | `AGENTS.md` |
 
-Edit the rule; re-run `/dotclaude:init`; the Copilot files regenerate. They carry the `dotclaude:managed` marker so the ownership model applies to them too.
+Copilot's 2026 surface mirrors Claude Code's (instructions, prompt files ≈ skills, custom agents ≈ subagents, and `.github/hooks/*.json` ≈ hooks). dotclaude generates the first four from one source — edit the rule/skill/agent in dotclaude, re-run `/dotclaude:init`, and the Copilot files regenerate. They carry the `dotclaude:managed` marker so the ownership model applies. **Hooks are deliberately not mirrored**: Copilot's hook I/O contract differs (camelCase events, `toolArgs`, JSON-output decisions vs exit-2), and Copilot's coding agent already has the org firewall/allowlist + branch protection + the AI-review workflows; mirroring hooks would be a second ecosystem to maintain for little marginal safety. Revisit if Copilot hooks leave preview and the contract stabilizes.
 
 ### Skills, agents, plans
 
