@@ -75,12 +75,12 @@ Follow the **PR Review Discipline** rule, and run this watch-and-iterate loop un
 
 Once the PR is open (the automatic review and any GitHub review apps post the first round):
 
-1. **Watch the PR for review activity** — poll on a short cadence (~2 min between checks) and **act the moment new comments land**; don't sit out a fixed interval if they're already there:
+1. **Poll for review activity.** `gh` has no watch mode for PR comments/reviews (only `gh pr checks --watch` for CI and `gh run watch` for Actions runs), so this is a sleep-and-poll loop: check, and if nothing new, sleep ~2 min and check again. Act the moment new comments land; don't sit out the interval if they're already there.
    ```
    gh pr view <n> --json reviews,comments,reviewDecision
    gh api repos/{owner}/{repo}/pulls/<n>/comments   # inline review threads
    ```
-   Keep watching up to ~10 minutes for a round to arrive (AI reviews can take several minutes). If a reviewer still hasn't posted after that, re-ping it or tell the user — don't block indefinitely, and don't treat the silence as approval.
+   Detect "new" by comparing the comment/review count or the latest `createdAt` against the previous poll (or use the REST `since` parameter). Keep polling up to ~10 minutes for a round to arrive (AI reviews can take several minutes). If a reviewer still hasn't posted after that, re-ping it or tell the user — don't block indefinitely, and don't treat the silence as approval.
 2. **When comments arrive, address each one:**
    - Implement the change, **or** deliberately decline it with a short reply explaining why.
    - **Resolve the thread** for each comment you've handled (`gh api graphql` → `resolveReviewThread`).
@@ -89,7 +89,7 @@ Once the PR is open (the automatic review and any GitHub review apps post the fi
    ```
    gh pr comment <n> --body "Addressed the feedback — @claude review, @codex review, @codex[agent] review, @copilot review"
    ```
-4. **Watch again the same way** (poll ~2 min apart, up to ~10 min for the round). Iterate steps 1–4 until **every** reviewer explicitly states it has no more comments (and `gh pr checks` is green). Silence is not sign-off — keep iterating, don't merge.
+4. **Poll again the same way** (~2 min apart, up to ~10 min for the round). Iterate steps 1–4 until **every** reviewer explicitly states it has no more comments. For the CI half of the gate you *can* block on a real watch: `gh pr checks <n> --watch --fail-fast`. Silence is not sign-off — keep iterating, don't merge.
 5. Merge only after the loop is clean **and** the user explicitly confirms.
 
 ## Rules
