@@ -1,6 +1,6 @@
 ---
-description: Scaffold or update the dotclaude project-local layer (base rules, settings baseline, CLAUDE.md block, and GitHub AI-review workflows) into the current project. Use when setting up dotclaude in a repo or pulling base-config updates. Respects local ownership — never clobbers project-owned files.
-argument-hint: "[--dry-run] [--no-github] [--no-rules]"
+description: Scaffold or update the dotclaude project-local layer (base rules, settings baseline, CLAUDE.md block, AGENTS.md, generated Copilot instructions, and GitHub AI-review workflows) into the current project. Use when setting up dotclaude in a repo or pulling base-config updates. Respects local ownership — never clobbers project-owned files.
+argument-hint: "[--dry-run] [--no-github] [--no-rules] [--no-copilot]"
 allowed-tools:
   - Bash(python3 *)
   - Read
@@ -10,7 +10,7 @@ allowed-tools:
 
 # dotclaude:init
 
-Scaffolds the **project-local layer** that the plugin itself cannot ship (Claude Code plugins carry hooks/agents/skills, but not `.claude/rules`, `settings.json` permissions, `CLAUDE.md`, or `.github/` workflows).
+Scaffolds the **project-local layer** that the plugin itself cannot ship (Claude Code plugins carry hooks/agents/skills, but not `.claude/rules`, `settings.json` permissions, `CLAUDE.md`, `AGENTS.md`, Copilot instructions, or `.github/` workflows).
 
 ## What it does
 
@@ -25,7 +25,10 @@ It writes/updates, under the project root (`$CLAUDE_PROJECT_DIR`):
 - `.claude/rules/*.md` — base rules (`code-quality`, `testing`, `security`, `error-handling`, `frontend`, `database`)
 - `.claude/settings.json` — additive-merges the marketplace wiring (`extraKnownMarketplaces` + `enabledPlugins`) and a permission baseline
 - `CLAUDE.md` — inserts/refreshes the managed dotclaude block
-- `.github/workflows/*.yml` + `.github/copilot-instructions.md` — AI-review workflow templates (skip with `--no-github`)
+- `AGENTS.md` — cross-tool pointer file (Copilot, Claude, others)
+- **Copilot instructions, generated from the Claude rules** (single source — edit the rule, not these): always-on rules → `.github/copilot-instructions.md`; each path-scoped rule → `.github/instructions/<name>.instructions.md` with `applyTo`. Skip with `--no-copilot`.
+- `.gitignore` — a managed block keeping project-local plans/overrides out of git (`.claude/plans/`, `CLAUDE.local.md`, `.claude/settings.local.json`)
+- `.github/workflows/*.yml` — AI-review workflow templates (skip with `--no-github`)
 
 ## Ownership model (no clash)
 
@@ -34,11 +37,13 @@ It writes/updates, under the project root (`$CLAUDE_PROJECT_DIR`):
 - **settings.json** is additive-merged: base allow/deny + plugin wiring are ensured present; your entries are preserved (arrays unioned, your scalars win).
 - **CLAUDE.md**: only the content between `<!-- dotclaude:begin -->` and `<!-- dotclaude:end -->` is replaced.
 
+Copilot instructions and `.github/instructions/*` are **derived from `.claude/rules/`** — never hand-edit them; change the rule and re-run. Generic plans live in the plugin (`templates/plans/`); project plans go in the gitignored `.claude/plans/`.
+
 ## How to run
 
 1. Confirm you're at the intended project root.
 2. Run with `--dry-run` first and show the user the report.
-3. If it looks right, run for real, then remind the user to delete rule files that don't fit their stack (e.g. `frontend.md`/`database.md` for a backend-only project) and to adjust `paths:` globs in `security.md`/`error-handling.md`.
+3. If it looks right, run for real, then remind the user to delete rule files that don't fit their stack (e.g. `frontend.md`/`database.md` for a backend-only project) and to adjust `paths:` globs in `security.md`/`error-handling.md`. (Adjusting a rule's `paths:` automatically updates its generated `applyTo`.)
 4. The GitHub workflows need repo secrets (`CLAUDE_CODE_OAUTH_TOKEN`, optionally `OPENAI_API_KEY` and the `_JH` fallbacks). Mention this; don't attempt to set secrets.
 
 After a real run, tell the user to `/reload-plugins` (or restart) so new rules and settings load.

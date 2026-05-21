@@ -21,7 +21,9 @@ One generic layer, reused across repos; a thin project-specific layer that **nev
 - **Hooks** (auto): secret scan, dangerous-command block, file protection, build-artifact block, format-on-save, auto-test, session-start context, post-compaction recovery, desktop notify.
 - **Agents**: `@security-reviewer`, `@code-reviewer`, `@performance-reviewer`, `@doc-reviewer`, `@frontend-designer`.
 - **Skills**: `/dotclaude:tdd`, `/dotclaude:ship`, `/dotclaude:debug-fix`, `/dotclaude:pr-review`, `/dotclaude:refactor`, `/dotclaude:explain`, `/dotclaude:test-writer`, `/dotclaude:context-budget`, `/dotclaude:init`.
-- **Base rules** + **settings baseline** + **CLAUDE.md block** + **GitHub AI-review workflows**, scaffolded by `/dotclaude:init`.
+- **Base rules** + **settings baseline** + **CLAUDE.md block** + **AGENTS.md** + **GitHub AI-review workflows**, scaffolded by `/dotclaude:init`.
+- **Copilot instructions generated from the Claude rules** — `.github/copilot-instructions.md` (always-on) and `.github/instructions/*.instructions.md` (path-scoped `applyTo`). Single source, so Claude and Copilot never drift.
+- **Plans**: generic playbooks ship in the plugin (`templates/plans/`); project plans live in the gitignored `.claude/plans/`.
 
 ## Updating
 

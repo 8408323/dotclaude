@@ -19,7 +19,24 @@ But a Claude Code plugin can only ship part of the picture:
 So dotclaude is a **hybrid**:
 
 1. **Engine = a plugin** (`plugins/dotclaude/`) shipping hooks + agents + skills. Installed from this repo (which is also the marketplace). Updates natively, namespaced (`/dotclaude:*`), never written into the project tree.
-2. **Project-local layer = templates + an `init` skill.** `/dotclaude:init` runs a deterministic sync engine that scaffolds the things a plugin can't carry: base rules, a settings baseline, a `CLAUDE.md` block, and the GitHub AI-review workflows.
+2. **Project-local layer = templates + an `init` skill.** `/dotclaude:init` runs a deterministic sync engine that scaffolds the things a plugin can't carry: base rules, a settings baseline, a `CLAUDE.md` block, an `AGENTS.md`, Copilot instructions, and the GitHub AI-review workflows.
+
+### Claude rules are the single source for Copilot too
+
+The Claude rules and GitHub Copilot's custom instructions cover the same ground, so dotclaude **generates the Copilot files from the rules** rather than maintaining two copies that drift:
+
+| Claude (`.claude/rules/`) | Generated Copilot artifact |
+|---|---|
+| `alwaysApply: true` rules | `.github/copilot-instructions.md` (header + concatenated bodies) |
+| `paths: [globs]` rules | `.github/instructions/<name>.instructions.md` with `applyTo: "<globs>"` |
+| (cross-tool pointer) | `AGENTS.md` |
+
+Edit the rule; re-run `/dotclaude:init`; the Copilot files regenerate. They carry the `dotclaude:managed` marker so the ownership model applies to them too.
+
+### Skills, agents, plans
+
+- **Skills / agents** are already two-layered: generic ones ship in the plugin (namespaced `/dotclaude:*`, `@agent`); project-specific ones live in the repo's `.claude/skills` and `.claude/agents` (short names, never touched by dotclaude).
+- **Plans**: generic, reusable playbooks live in the plugin (`templates/plans/`). Project-specific plans live in the repo's `.claude/plans/`, which `/dotclaude:init` adds to `.gitignore` — local working docs, not committed.
 
 ## The no-clash ownership model
 
@@ -46,10 +63,12 @@ dotclaude/
 │   ├── agents/        5 reviewer subagents
 │   ├── skills/        workflow skills + dotclaude-init (sync engine + tests)
 │   └── templates/     the project-local layer init writes
-│       ├── rules/         base rules (managed)
+│       ├── rules/         base rules (managed) — also the source for Copilot
 │       ├── settings.base.json
 │       ├── CLAUDE.block.md
-│       └── github/        AI-review workflow templates (dotgithub)
+│       ├── AGENTS.md      cross-tool pointer
+│       ├── plans/         generic reusable playbooks (reference, not copied in)
+│       └── github/        copilot-instructions.header.md + AI-review workflows
 ├── .github/workflows/ci.yml            # this repo's own CI
 └── PLAN.md / README.md / LICENSE
 ```

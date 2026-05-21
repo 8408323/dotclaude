@@ -8,6 +8,7 @@ import tempfile
 from pathlib import Path
 
 _spec = importlib.util.spec_from_file_location("sync", Path(__file__).with_name("sync.py"))
+assert _spec and _spec.loader
 sync = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(sync)
 
@@ -54,20 +55,49 @@ def test_managed_overwrite_and_ownership():
         check("project ownership respected", dst.read_text() == "MINE")
 
 
-def test_claude_block_replace():
+def test_block_replace():
     with tempfile.TemporaryDirectory() as d:
         root = Path(d)
         rep = sync.Report()
-        tpl = root / "block.md"
-        tpl.write_text("<!-- dotclaude:begin -->\nV2\n<!-- dotclaude:end -->")
         dst = root / "CLAUDE.md"
         dst.write_text("# Proj\nkeep me\n<!-- dotclaude:begin -->\nV1\n<!-- dotclaude:end -->\ntail")
-        sync.sync_claude_block(tpl, dst, root, rep, dry=False)
+        sync.sync_block("<!-- dotclaude:begin -->\nV2\n<!-- dotclaude:end -->", dst,
+                        sync.BLOCK_BEGIN, sync.BLOCK_END, root, rep, dry=False)
         out = dst.read_text()
         check("block replaced", "V2" in out and "V1" not in out)
         check("project content kept", "keep me" in out and "tail" in out)
 
 
-for fn in [test_merge_json, test_is_managed, test_managed_overwrite_and_ownership, test_claude_block_replace]:
+def test_parse_rule():
+    always, paths, body = sync.parse_rule(
+        "---\nalwaysApply: true\n---\n<!-- dotclaude:managed -->\n# Code\n- be terse")
+    check("always-on detected", always and not paths)
+    check("marker + frontmatter stripped from body", "dotclaude:managed" not in body and "be terse" in body)
+    always2, paths2, _ = sync.parse_rule(
+        "---\npaths:\n  - \"src/**\"\n  - \"lib/**\"\n---\n# Sec\nvalidate")
+    check("path-scoped parsed", not always2 and paths2 == ["src/**", "lib/**"])
+
+
+def test_generate_copilot():
+    with tempfile.TemporaryDirectory() as d:
+        root = Path(d)
+        rep = sync.Report()
+        rules = root / ".claude" / "rules"
+        rules.mkdir(parents=True)
+        (rules / "code-quality.md").write_text("---\nalwaysApply: true\n---\n<!-- dotclaude:managed -->\n# CQ\n- no dead code")
+        (rules / "security.md").write_text("---\npaths:\n  - \"app/**\"\n---\n<!-- dotclaude:managed -->\n# Sec\n- validate input")
+        header = root / "header.md"
+        header.write_text("<!-- dotclaude:managed -->\n# Copilot Instructions")
+        sync.generate_copilot(rules, header, root, rep, dry=False)
+        ci = (root / ".github" / "copilot-instructions.md").read_text()
+        check("repo-wide includes header + always-on body", "Copilot Instructions" in ci and "no dead code" in ci)
+        check("repo-wide excludes path-scoped body", "validate input" not in ci)
+        inst = (root / ".github" / "instructions" / "security.instructions.md").read_text()
+        check("path-scoped applyTo mapped", 'applyTo: "app/**"' in inst and "validate input" in inst)
+        check("generated files carry managed marker", sync.MARKER in ci and sync.MARKER in inst)
+
+
+for fn in [test_merge_json, test_is_managed, test_managed_overwrite_and_ownership,
+           test_block_replace, test_parse_rule, test_generate_copilot]:
     fn()
 print(f"OK — {passed} checks passed")
