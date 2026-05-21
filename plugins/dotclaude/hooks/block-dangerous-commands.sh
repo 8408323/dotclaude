@@ -170,6 +170,25 @@ if contains_cmd '(^|[;&|()]+[[:space:]]*)((env|command|exec|sudo|nice|time|bash|
   if contains_cmd 'git([[:space:]]+[^[:space:]]+)*[[:space:]]+push([[:space:]]+[^[:space:]]+)*[[:space:]]+[^[:space:]]*(\$|`)'; then
     emit_deny "Blocked: 'git push' with a shell-expanded refspec (\$VAR, \${VAR}, \$(...), or backtick). Use a literal branch name so the protected-branch guard can verify the target."
   fi
+  # --all and --mirror push every local branch (including protected ones)
+  # to the remote in one shot — neither names a specific branch, so the
+  # explicit-refspec check above can't catch them. Treat both as
+  # unconditionally dangerous; the operator can run them manually outside
+  # the agent session if truly needed.
+  # (`--delete <protected>` is already covered by the explicit-refspec
+  # check above, since the protected branch name appears at the end of
+  # the command and the leading-tokens alternation matches `--delete origin`
+  # as intermediate tokens.)
+  # Checked before the bare-push rule below: `--all`/`--mirror` also match
+  # the bare-push pattern, and these flag-specific reasons are more useful
+  # than the generic "you are on a protected branch" message — and don't
+  # depend on the ambient current branch, so the result is deterministic.
+  if contains_cmd 'git([[:space:]]+[^[:space:]]+)*[[:space:]]+push([[:space:]]+[^[:space:]]+)*[[:space:]]+--all([[:space:]=]|$)'; then
+    emit_deny "Blocked: 'git push --all' would push every local branch (including protected ones). Push a specific feature branch instead."
+  fi
+  if contains_cmd 'git([[:space:]]+[^[:space:]]+)*[[:space:]]+push([[:space:]]+[^[:space:]]+)*[[:space:]]+--mirror([[:space:]=]|$)'; then
+    emit_deny "Blocked: 'git push --mirror' mirrors every local ref to the remote (including protected branches and tags). Run manually if intended."
+  fi
   # Bare `git push` while on a protected branch — covers `git push`,
   # `git push <remote>`, `git push <flags...>`, `git push <flags...> <remote>`
   # (no refspec). All of these default to pushing the current branch, so if
@@ -184,21 +203,6 @@ if contains_cmd '(^|[;&|()]+[[:space:]]*)((env|command|exec|sudo|nice|time|bash|
   if contains_cmd 'git([[:space:]]+[^[:space:]]+)*[[:space:]]+push([[:space:]]+[^[:space:]]+)*[[:space:]]+(-[a-zA-Z]*f[a-zA-Z]*|--force)([[:space:]=]|$)' \
      && ! contains_cmd '\-\-force-with-lease'; then
     emit_deny "Blocked: force push is not allowed. Use --force-with-lease if you must overwrite remote."
-  fi
-  # --all and --mirror push every local branch (including protected ones)
-  # to the remote in one shot — neither names a specific branch, so the
-  # explicit-refspec check above can't catch them. Treat both as
-  # unconditionally dangerous; the operator can run them manually outside
-  # the agent session if truly needed.
-  # (`--delete <protected>` is already covered by the explicit-refspec
-  # check above, since the protected branch name appears at the end of
-  # the command and the leading-tokens alternation matches `--delete origin`
-  # as intermediate tokens.)
-  if contains_cmd 'git([[:space:]]+[^[:space:]]+)*[[:space:]]+push([[:space:]]+[^[:space:]]+)*[[:space:]]+--all([[:space:]=]|$)'; then
-    emit_deny "Blocked: 'git push --all' would push every local branch (including protected ones). Push a specific feature branch instead."
-  fi
-  if contains_cmd 'git([[:space:]]+[^[:space:]]+)*[[:space:]]+push([[:space:]]+[^[:space:]]+)*[[:space:]]+--mirror([[:space:]=]|$)'; then
-    emit_deny "Blocked: 'git push --mirror' mirrors every local ref to the remote (including protected branches and tags). Run manually if intended."
   fi
 fi
 
