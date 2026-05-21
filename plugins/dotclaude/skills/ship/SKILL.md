@@ -71,16 +71,26 @@ Ship the current changes through commit, push, and PR creation. Confirm with the
 
 ## Step 5: Review & merge discipline
 
-Follow the **PR Review Discipline** rule. Do not merge an unreviewed PR.
+Follow the **PR Review Discipline** rule, and run this watch-and-iterate loop until the PR is clean. Do not merge an unreviewed PR.
 
-- After the PR is open, let the reviewers run. The repo's automatic review (e.g. `claude-code-review.yml`) and any GitHub review apps post the first round.
-- When the user has you address comments: fix them, push, then **resolve each fixed thread** and request re-review in one comment mentioning every reviewer in use:
-  ```
-  gh pr comment <n> --body "Addressed the feedback — @claude review, @codex review, @codex[agent] review, @copilot review"
-  ```
-  (Resolve threads via `gh api graphql` with `resolveReviewThread`.)
-- **Before merging**, confirm every reviewer has actually responded (posted comments or stated none) and `gh pr checks` is green. If a reviewer hasn't weighed in, wait or ping it — never merge on silence.
-- Merge only on explicit user confirmation.
+Once the PR is open (the automatic review and any GitHub review apps post the first round):
+
+1. **Wait ~2 minutes, then check for new review activity.** Poll the PR rather than blocking — re-read it after the wait:
+   ```
+   gh pr view <n> --json reviews,comments,reviewDecision
+   gh api repos/{owner}/{repo}/pulls/<n>/comments   # inline review threads
+   ```
+   If nothing new yet, wait another ~2 minutes and check again. (Watch the PR if your environment supports it instead of sleeping.)
+2. **When comments arrive, address each one:**
+   - Implement the change, **or** deliberately decline it with a short reply explaining why.
+   - **Resolve the thread** for each comment you've handled (`gh api graphql` → `resolveReviewThread`).
+   - **Do not resolve** a thread that asks a question or requests more information — reply with the info and leave it open.
+3. **Push the fixes**, then re-request review in one comment mentioning every reviewer in use:
+   ```
+   gh pr comment <n> --body "Addressed the feedback — @claude review, @codex review, @codex[agent] review, @copilot review"
+   ```
+4. **Wait ~2 minutes and watch again.** Iterate steps 1–4 until **every** reviewer explicitly states it has no more comments (and `gh pr checks` is green). Silence is not sign-off — keep iterating, don't merge.
+5. Merge only after the loop is clean **and** the user explicitly confirms.
 
 ## Rules
 
