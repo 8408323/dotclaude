@@ -1,0 +1,50 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          { "type": "command", "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/protect-files.sh\"", "timeout": 5000, "statusMessage": "Checking file protections..." },
+          { "type": "command", "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/block-build-artifacts.sh\"", "timeout": 5000, "statusMessage": "Checking for build artifacts..." },
+          { "type": "command", "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/scan-secrets.sh\"", "timeout": 5000, "statusMessage": "Scanning for secrets..." }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          { "type": "command", "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/block-dangerous-commands.sh\"", "timeout": 5000, "statusMessage": "Checking command safety..." }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          { "type": "command", "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/format-on-save.sh\"", "timeout": 15000, "statusMessage": "Formatting..." }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          { "type": "command", "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/session-start.sh\"", "timeout": 5000, "statusMessage": "Loading project context..." }
+        ]
+      },
+      {
+        "matcher": "compact",
+        "hooks": [
+          { "type": "command", "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/context-recovery.sh\"", "timeout": 5000, "statusMessage": "Re-injecting project rules after compaction..." }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          { "type": "command", "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/notify.sh\"", "timeout": 5000 }
+        ]
+      }
+    ]
+  }
+}

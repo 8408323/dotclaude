@@ -1,0 +1,11 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+
+# Local AI session overrides
+CLAUDE.local.md
+.claude/settings.local.json
+
+# OS
+.DS_Store
