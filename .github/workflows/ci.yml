@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  validate:
+    name: Validate plugin & marketplace
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: JSON syntax (manifests + settings baseline)
+        run: |
+          for f in .claude-plugin/marketplace.json \
+                   plugins/dotclaude/.claude-plugin/plugin.json \
+                   plugins/dotclaude/hooks/hooks.json \
+                   plugins/dotclaude/templates/settings.base.json; do
+            echo "checking $f"
+            python3 -m json.tool "$f" > /dev/null
+          done
+
+      - name: Install Claude Code CLI
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: claude plugin validate
+        run: claude plugin validate ./plugins/dotclaude
+
+  shellcheck:
+    name: ShellCheck hooks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install shellcheck
+        run: sudo apt-get update && sudo apt-get install -y shellcheck
+      - name: Lint hook scripts
+        run: shellcheck plugins/dotclaude/hooks/*.sh plugins/dotclaude/hooks/tests/*.sh
+
+  hook-tests:
+    name: Hook fixture tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+      - name: Run hook fixture suite
+        run: bash plugins/dotclaude/hooks/tests/run-all.sh
+
+  sync-engine:
+    name: Sync engine tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Unit tests
+        run: python3 plugins/dotclaude/skills/dotclaude-init/test_sync.py
+      - name: End-to-end dry-run into a scratch project
+        run: |
+          mkdir -p /tmp/proj && cd /tmp/proj && git init -q
+          CLAUDE_PROJECT_DIR=/tmp/proj python3 "$GITHUB_WORKSPACE/plugins/dotclaude/skills/dotclaude-init/sync.py" --dry-run

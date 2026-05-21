@@ -1,0 +1,44 @@
+---
+description: Scaffold or update the dotclaude project-local layer (base rules, settings baseline, CLAUDE.md block, and GitHub AI-review workflows) into the current project. Use when setting up dotclaude in a repo or pulling base-config updates. Respects local ownership — never clobbers project-owned files.
+argument-hint: "[--dry-run] [--no-github] [--no-rules]"
+allowed-tools:
+  - Bash(python3 *)
+  - Read
+  - Edit
+  - Glob
+---
+
+# dotclaude:init
+
+Scaffolds the **project-local layer** that the plugin itself cannot ship (Claude Code plugins carry hooks/agents/skills, but not `.claude/rules`, `settings.json` permissions, `CLAUDE.md`, or `.github/` workflows).
+
+## What it does
+
+Runs the deterministic sync engine bundled with the plugin:
+
+```bash
+python3 "${CLAUDE_PLUGIN_ROOT}/skills/dotclaude-init/sync.py" $ARGUMENTS
+```
+
+It writes/updates, under the project root (`$CLAUDE_PROJECT_DIR`):
+
+- `.claude/rules/*.md` — base rules (`code-quality`, `testing`, `security`, `error-handling`, `frontend`, `database`)
+- `.claude/settings.json` — additive-merges the marketplace wiring (`extraKnownMarketplaces` + `enabledPlugins`) and a permission baseline
+- `CLAUDE.md` — inserts/refreshes the managed dotclaude block
+- `.github/workflows/*.yml` + `.github/copilot-instructions.md` — AI-review workflow templates (skip with `--no-github`)
+
+## Ownership model (no clash)
+
+- **Managed** files carry a `dotclaude:managed` marker and are regenerated on every run. To take local ownership of one, delete its marker line — sync then reports `skip-own` and never touches it again.
+- **Unmarked** files are yours; sync never touches them.
+- **settings.json** is additive-merged: base allow/deny + plugin wiring are ensured present; your entries are preserved (arrays unioned, your scalars win).
+- **CLAUDE.md**: only the content between `<!-- dotclaude:begin -->` and `<!-- dotclaude:end -->` is replaced.
+
+## How to run
+
+1. Confirm you're at the intended project root.
+2. Run with `--dry-run` first and show the user the report.
+3. If it looks right, run for real, then remind the user to delete rule files that don't fit their stack (e.g. `frontend.md`/`database.md` for a backend-only project) and to adjust `paths:` globs in `security.md`/`error-handling.md`.
+4. The GitHub workflows need repo secrets (`CLAUDE_CODE_OAUTH_TOKEN`, optionally `OPENAI_API_KEY` and the `_JH` fallbacks). Mention this; don't attempt to set secrets.
+
+After a real run, tell the user to `/reload-plugins` (or restart) so new rules and settings load.
