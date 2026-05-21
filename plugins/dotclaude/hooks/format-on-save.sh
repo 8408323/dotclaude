@@ -71,7 +71,7 @@ fi
 # installed inside the project venv, not on PATH.
 RUFF=""
 if command -v uv >/dev/null 2>&1 && [ -f "$ROOT/uv.lock" ]; then
-  RUFF="uv run ruff"
+  RUFF="uv run --no-sync ruff"
 elif command -v ruff >/dev/null 2>&1; then
   RUFF="ruff"
 fi
