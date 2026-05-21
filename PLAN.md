@@ -77,6 +77,13 @@ dotclaude/
 
 The `.github/` AI-review workflows live **in this same repo** under `plugins/dotclaude/templates/github/`, not in a separate repo. Rationale: one source of truth and atomic versioning of the whole AI dev environment; the same `/dotclaude:init` that scaffolds rules/settings also installs the workflows. A separate repo would only add coordination overhead for no benefit at this scale.
 
+The GitHub-side content is really two kinds:
+
+1. **Derived** — `.github/copilot-instructions.md`, `.github/instructions/*`, `AGENTS.md` are *generated from `.claude/rules/`* (single source, so Claude and Copilot can't drift). This part is intrinsic to dotclaude and must never be split out — separating it would force either duplicated rules or a cross-repo dependency.
+2. **Independent automation** — the AI-review workflows (`claude`, `codex`, `claude-code-review`) don't depend on the rules and *could* live apart, but at 3 small files they don't justify a second repo, install path, or version coordination.
+
+**When to split:** not "should GitHub stuff be separate" but "has the workflow automation grown into a library?" (many composite actions, org-wide pipelines, several repos needing identical CI). If so, the right form is **not** a templates-copied-by-init repo — it's GitHub-native sharing: an **org-level `.github` repo** and/or **reusable workflows** (`uses: 8408323/dotgithub/.github/workflows/x.yml@ref`). Until then: derived content stays in dotclaude forever; workflow automation stays here too until it outgrows a handful of files, then graduates.
+
 ## CI/CD
 
 `.github/workflows/ci.yml` runs on push/PR:
