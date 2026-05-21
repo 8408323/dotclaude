@@ -26,7 +26,10 @@ It writes/updates, under the project root (`$CLAUDE_PROJECT_DIR`):
 - `.claude/settings.json` — additive-merges the marketplace wiring (`extraKnownMarketplaces` + `enabledPlugins`) and a permission baseline
 - `CLAUDE.md` — inserts/refreshes the managed dotclaude block
 - `AGENTS.md` — cross-tool pointer file (Copilot, Claude, others)
-- **Copilot instructions, generated from the Claude rules** (single source — edit the rule, not these): always-on rules → `.github/copilot-instructions.md`; each path-scoped rule → `.github/instructions/<name>.instructions.md` with `applyTo`. Skip with `--no-copilot`.
+- **Copilot layer, generated from the plugin (single source — edit the source in dotclaude, not these)**, skip all with `--no-copilot`:
+  - instructions: always-on rules → `.github/copilot-instructions.md`; each path-scoped rule → `.github/instructions/<name>.instructions.md` with `applyTo`.
+  - prompts: workflow skills → `.github/prompts/<name>.prompt.md` (`mode: agent`); skips Claude-Code-only skills (`context-budget`, `dotclaude-init`).
+  - custom agents: reviewer agents → `.github/agents/<name>.md`.
 - `.gitignore` — a managed block keeping project-local plans/overrides out of git (`.claude/plans/`, `CLAUDE.local.md`, `.claude/settings.local.json`)
 - `.github/workflows/*.yml` — AI-review workflow templates (skip with `--no-github`)
 
