@@ -75,12 +75,12 @@ Follow the **PR Review Discipline** rule, and run this watch-and-iterate loop un
 
 Once the PR is open (the automatic review and any GitHub review apps post the first round):
 
-1. **Wait ~2 minutes, then check for new review activity.** Poll the PR rather than blocking — re-read it after the wait:
+1. **Watch the PR for review activity** — poll on a short cadence (~2 min between checks) and **act the moment new comments land**; don't sit out a fixed interval if they're already there:
    ```
    gh pr view <n> --json reviews,comments,reviewDecision
    gh api repos/{owner}/{repo}/pulls/<n>/comments   # inline review threads
    ```
-   If nothing new yet, wait another ~2 minutes and check again. (Watch the PR if your environment supports it instead of sleeping.)
+   Keep watching up to ~10 minutes for a round to arrive (AI reviews can take several minutes). If a reviewer still hasn't posted after that, re-ping it or tell the user — don't block indefinitely, and don't treat the silence as approval.
 2. **When comments arrive, address each one:**
    - Implement the change, **or** deliberately decline it with a short reply explaining why.
    - **Resolve the thread** for each comment you've handled (`gh api graphql` → `resolveReviewThread`).
@@ -89,7 +89,7 @@ Once the PR is open (the automatic review and any GitHub review apps post the fi
    ```
    gh pr comment <n> --body "Addressed the feedback — @claude review, @codex review, @codex[agent] review, @copilot review"
    ```
-4. **Wait ~2 minutes and watch again.** Iterate steps 1–4 until **every** reviewer explicitly states it has no more comments (and `gh pr checks` is green). Silence is not sign-off — keep iterating, don't merge.
+4. **Watch again the same way** (poll ~2 min apart, up to ~10 min for the round). Iterate steps 1–4 until **every** reviewer explicitly states it has no more comments (and `gh pr checks` is green). Silence is not sign-off — keep iterating, don't merge.
 5. Merge only after the loop is clean **and** the user explicitly confirms.
 
 ## Rules
