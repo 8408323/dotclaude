@@ -3,10 +3,16 @@
 # Used as a SessionStart hook with matcher "compact".
 #
 # When Claude's context window fills up, compaction summarizes the conversation
-# and loses specific details. This hook restores your non-negotiable project
+# and loses specific details. This hook restores the project's non-negotiable
 # rules so Claude stays aligned even after compaction.
 #
-# Customize the RULES section below with your project-specific requirements.
+# It re-injects the project's own always-on rules (the `.claude/rules/*.md`
+# files with `alwaysApply: true`), so recovery is automatically project-aware —
+# no per-project editing of this script needed. If the project has no such
+# rules, it falls back to a minimal generic block.
+
+PROJECT_DIR="${CLAUDE_PROJECT_DIR:-$PWD}"
+RULES_DIR="$PROJECT_DIR/.claude/rules"
 
 # ──────────────────────────────────────────────
 # Dynamic context (same as session-start.sh)
@@ -30,43 +36,49 @@ if [ "$CHANGES" -gt 0 ] 2>/dev/null; then
 fi
 
 # ──────────────────────────────────────────────
-# Re-inject critical project rules
+# Re-inject the project's always-on rules
 # ──────────────────────────────────────────────
+# An always-on rule has `alwaysApply: true` in its frontmatter. Path-scoped
+# rules are deliberately skipped — they load on demand near matching files and
+# don't need to survive compaction. The frontmatter and the dotclaude:managed
+# marker are stripped so only the instruction body is re-injected.
 
-cat <<'RULES'
-=== CONTEXT RECOVERED AFTER COMPACTION ===
+emit_rule_bodies() {
+  local found=1 f
+  for f in "$RULES_DIR"/*.md; do
+    [ -f "$f" ] || continue
+    awk 'NR==1 && $0=="---"{fm=1; next}
+         fm && $0=="---"{exit}
+         fm && /^alwaysApply:[[:space:]]*true[[:space:]]*$/{ok=1}
+         END{exit !ok}' "$f" || continue
+    found=0
+    echo "── ${f##*/} ──"
+    # Drop the YAML frontmatter block and the managed-marker comment.
+    awk 'NR==1 && $0=="---"{infm=1; next}
+         infm && $0=="---"{infm=0; next}
+         infm{next}
+         /dotclaude:managed/{next}
+         {print}' "$f"
+    echo
+  done
+  return $found
+}
 
-CRITICAL PROJECT RULES (restored automatically. Do not ignore):
+echo "=== CONTEXT RECOVERED AFTER COMPACTION ==="
+echo ""
+echo "CRITICAL PROJECT RULES (restored automatically — do not ignore):"
+echo ""
 
-1. TESTING
-   - Run the specific test file after changes, not the full suite.
-   - Tests must verify behavior, not implementation details.
-   - Prefer real implementations over mocks. Only mock at system boundaries.
-   - One behavior per test. Multiple related asserts on the same output are OK. Arrange-Act-Assert structure.
-
-2. CODE QUALITY
-   - Don't add features beyond what was asked.
-   - No dead code or commented-out blocks.
-   - Functions do one thing. No magic values.
-   - Match the conventions of the surrounding code; don't impose new ones.
-
-3. WORKFLOW
-   - Run typecheck after making code changes.
-   - Prefer fixing root causes over workarounds.
-   - Don't modify generated files (*.gen.ts, *.generated.*).
-   - Don't modify lock files, .env files, or hook scripts.
-
-4. SECURITY
-   - Never commit secrets, tokens, or credentials.
-   - Validate all user input at system boundaries.
-   - Parameterized queries only. No string interpolation in SQL.
-
-5. GIT
-   - Don't push directly to main/master.
-   - No force pushes (use --force-with-lease if needed).
-   - Create feature branches for all work.
-
+if ! emit_rule_bodies; then
+  # Fallback for projects that haven't scaffolded .claude/rules yet.
+  cat <<'RULES'
+- Verify behavior, not implementation. Run the specific test file, not the full suite.
+- Don't add features beyond what was asked. No dead code. Match surrounding conventions.
+- Never commit or log secrets, tokens, credentials, or PII. Validate untrusted input at boundaries.
+- Don't push to main/master; no force pushes (use --force-with-lease); work on feature branches.
+- Don't modify generated files, lock files, or .env files.
 RULES
+fi
 
 # ──────────────────────────────────────────────
 # Append dynamic context
@@ -77,13 +89,9 @@ if [ -n "$CONTEXT" ]; then
   echo "Current state: $CONTEXT"
 fi
 
-# NOTE: previously this hook re-injected the full `cat CLAUDE.md` here
-# as a "belt and suspenders" measure, but CLAUDE.md in this repo is
-# hundreds of lines and re-injecting the whole file on every compaction
-# largely negates the benefit of compaction — it pushes the conversation
-# right back toward the context limit. Claude can re-read CLAUDE.md on
-# demand from disk; the small static `RULES` block above is the only
-# thing that genuinely needs to survive a compaction cycle.
+# Full CLAUDE.md is intentionally not re-injected — it can be large and would
+# negate the benefit of compaction. Claude can re-read it from disk on demand;
+# the always-on rules above are what genuinely must survive a compaction cycle.
 
 echo ""
 echo "=== END CONTEXT RECOVERY ==="
