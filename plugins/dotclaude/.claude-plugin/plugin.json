@@ -2,7 +2,6 @@
   "$schema": "https://json.schemastore.org/claude-code-plugin.json",
   "name": "dotclaude",
   "description": "Guardrail hooks, reviewer subagents, and workflow skills for Claude Code, plus /dotclaude:init to scaffold the project-local config layer (rules, settings baseline, CLAUDE.md block, GitHub AI-review workflows).",
-  "version": "0.1.0",
   "author": {
     "name": "Carl Falk",
     "email": "carl.falk@parix.se"
