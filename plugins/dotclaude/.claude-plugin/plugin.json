@@ -3,8 +3,7 @@
   "name": "dotclaude",
   "description": "Guardrail hooks, reviewer subagents, and workflow skills for Claude Code, plus /dotclaude:init to scaffold the project-local config layer (rules, settings baseline, CLAUDE.md block, GitHub AI-review workflows).",
   "author": {
-    "name": "Carl Falk",
-    "email": "carl.falk@parix.se"
+    "name": "Jonathan Haraldsson"
   },
   "homepage": "https://github.com/8408323/dotclaude",
   "repository": "https://github.com/8408323/dotclaude",
