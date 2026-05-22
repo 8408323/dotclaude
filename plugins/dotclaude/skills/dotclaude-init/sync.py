@@ -305,6 +305,8 @@ def main() -> int:
 
     sync_settings(tpl / "settings.base.json", root / ".claude" / "settings.json", root, rep, args.dry_run)
     sync_managed_file(tpl / "AGENTS.md", root / "AGENTS.md", root, rep, args.dry_run)
+    sync_managed_file(tpl / "github" / "pull_request_template.md",
+                      root / ".github" / "pull_request_template.md", root, rep, args.dry_run)
     if not args.no_claude:
         sync_block(
             (tpl / "CLAUDE.block.md").read_text(), root / "CLAUDE.md",
