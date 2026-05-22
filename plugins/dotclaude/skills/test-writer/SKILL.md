@@ -2,7 +2,7 @@
 name: test-writer
 description: Write comprehensive tests for new or changed code. Use automatically when new features are added, functions are created, or behavior is modified.
 # No disable-model-invocation. Claude can auto-trigger this when adding features.
-# Add "disable-model-invocation: true" below if you prefer manual-only via /test-writer.
+# Add "disable-model-invocation: true" below if you prefer manual-only via /dotclaude:test-writer.
 ---
 
 Write comprehensive tests for the code that was just added or changed.

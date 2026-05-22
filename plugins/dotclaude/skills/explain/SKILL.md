@@ -9,7 +9,7 @@ Explain `$ARGUMENTS` clearly.
 
 ## Mode
 
-If `$ARGUMENTS` includes the word `verbose` (for example, `/explain my-function verbose`), produce all five sections below. Strip the word `verbose` from the target name when deciding what to explain.
+If `$ARGUMENTS` includes the word `verbose` (for example, `/dotclaude:explain my-function verbose`), produce all five sections below. Strip the word `verbose` from the target name when deciding what to explain.
 
 Otherwise (the default), produce only sections 1 and 2, then stop. Day-to-day, that's usually all you need.
 
