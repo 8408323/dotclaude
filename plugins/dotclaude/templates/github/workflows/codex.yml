@@ -52,7 +52,7 @@ jobs:
             printf '%s' "$ISSUE_COMMENT_BODY" > /tmp/codex_prompt.txt
           fi
 
-      - name: Run Codex (carl.falk@parix.se)
+      - name: Run Codex (Jonathan Haraldsson)
         id: run_codex
         continue-on-error: true
         uses: openai/codex-action@v1

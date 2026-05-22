@@ -40,7 +40,7 @@ jobs:
         with:
           fetch-depth: 1
 
-      - name: Run Claude Code (carl.falk@parix.se)
+      - name: Run Claude Code (Jonathan Haraldsson)
         id: claude
         continue-on-error: true
         uses: anthropics/claude-code-action@v1
