@@ -16,6 +16,7 @@ passed = 0
 
 
 def check(name: str, cond: bool) -> None:
+    """Assert `cond`, raising with the named message on failure; count passes."""
     global passed
     assert cond, f"FAIL: {name}"
     passed += 1

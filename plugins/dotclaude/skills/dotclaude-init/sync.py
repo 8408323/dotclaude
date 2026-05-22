@@ -40,14 +40,24 @@ def find_templates() -> Path:
 
 
 def is_managed(text: str) -> bool:
+    """Return True if the file's first paragraph carries the managed marker.
+
+    Only the leading block (up to the first blank line) is inspected, so a
+    later incidental mention of the marker word in the body doesn't count as
+    a managed-ownership claim.
+    """
     return MARKER in text.split("\n\n", 1)[0] if text else False
 
 
 class Report:
+    """Accumulates one human-readable line per file action for the run summary."""
+
     def __init__(self) -> None:
         self.lines: list[str] = []
 
     def add(self, action: str, path: Path, root: Path) -> None:
+        # Record an action; show the path relative to the project root when
+        # possible, otherwise fall back to the absolute path.
         try:
             rel = path.relative_to(root)
         except ValueError:
@@ -77,6 +87,7 @@ def write_managed(dst: Path, content: str, root: Path, rep: Report, dry: bool) -
 
 
 def sync_managed_file(src: Path, dst: Path, root: Path, rep: Report, dry: bool) -> None:
+    """Copy a managed template file `src` to `dst` under the ownership rules."""
     write_managed(dst, src.read_text(), root, rep, dry)
 
 
@@ -280,6 +291,7 @@ def generate_copilot_agents(agents_dir: Path, root: Path, rep: Report, dry: bool
 
 
 def main() -> int:
+    """Parse CLI args, run each sync step, print the report, and return an exit code."""
     ap = argparse.ArgumentParser(description="Sync the dotclaude project-local layer.")
     ap.add_argument("--project", default=None, help="target project root (default: $CLAUDE_PROJECT_DIR or cwd)")
     ap.add_argument("--dry-run", action="store_true", help="show what would change, write nothing")

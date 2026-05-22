@@ -44,9 +44,16 @@ fi
 # marker are stripped so only the instruction body is re-injected.
 
 emit_rule_bodies() {
+  # `found` tracks whether any always-on rule was emitted: it starts at 1
+  # (treated as the failure / "none found" exit status) and flips to 0 once
+  # at least one rule is printed, so the caller's `if ! emit_rule_bodies`
+  # falls back to the generic block only when nothing matched.
   local found=1 f
   for f in "$RULES_DIR"/*.md; do
     [ -f "$f" ] || continue
+    # Keep only rules whose frontmatter declares `alwaysApply: true`; this awk
+    # exits non-zero (so the `|| continue` skips the file) for any rule that
+    # lacks that flag in its leading `---`-delimited frontmatter block.
     awk 'NR==1 && $0=="---"{fm=1; next}
          fm && $0=="---"{exit}
          fm && /^alwaysApply:[[:space:]]*true[[:space:]]*$/{ok=1}

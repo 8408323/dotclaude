@@ -35,8 +35,9 @@ FILE_PATH=$(printf '%s' "$INPUT" | jq -r '.tool_input.file_path // empty' 2>/dev
 # be interpreted as a flag by GNU basename. Parameter expansion is shell-builtin
 # and consistent across bash/zsh.
 BASENAME=${FILE_PATH##*/}
-# Lower-cased copies of the basename and full path, for case-insensitive matching
-# (filesystems on macOS/Windows are case-insensitive, so `.ENV` must match `.env`).
+# Lower-cased copies of the basename and full path, for case-insensitive matching.
+# Default filesystems on macOS and Windows are case-insensitive (though both can be
+# configured case-sensitive), so we normalize case to ensure `.ENV` still matches `.env`.
 BASENAME_LC=$(printf '%s' "$BASENAME" | tr '[:upper:]' '[:lower:]')
 PATH_LC=$(printf '%s' "$FILE_PATH" | tr '[:upper:]' '[:lower:]')
 

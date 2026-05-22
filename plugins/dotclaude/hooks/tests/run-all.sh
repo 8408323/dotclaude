@@ -67,6 +67,9 @@ run_case() {
     ok=0
   fi
 
+  # Assert the substrings listed in fixture field `$1` against output file `$2`.
+  # With invert="no" every substring must be present (else the case fails);
+  # with invert="yes" none may be present. Sets `ok=0` on any violation.
   check_subs() {
     local field="$1" file="$2" invert="$3"
     local count
