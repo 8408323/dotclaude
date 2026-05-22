@@ -120,7 +120,7 @@ def test_generate_copilot_prompts_and_agents():
         sync.generate_copilot_prompts(skills, root, rep, dry=False)
         sync.generate_copilot_agents(agents, root, rep, dry=False)
         prompt = (root / ".github" / "prompts" / "ship.prompt.md").read_text()
-        check("prompt has agent mode + description", "mode: agent" in prompt and "Ship changes" in prompt)
+        check("prompt uses agent frontmatter key + description", "agent: 'agent'" in prompt and "mode: agent" not in prompt and "Ship changes" in prompt)
         check("prompt maps $ARGUMENTS to copilot input", "${input:args}" in prompt and "$ARGUMENTS" not in prompt)
         check("claude-only skill skipped", not (root / ".github" / "prompts" / "context-budget.prompt.md").exists())
         agent = (root / ".github" / "agents" / "code-reviewer.md").read_text()
