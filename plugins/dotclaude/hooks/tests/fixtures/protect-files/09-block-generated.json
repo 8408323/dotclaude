@@ -1,5 +1,5 @@
 {
-  "name": "block *.generated.ts",
+  "name": "Blocks editing a generated .generated.ts file",
   "stdin": { "tool_input": { "file_path": "src/types.generated.ts" } },
   "expect_exit": 2
 }

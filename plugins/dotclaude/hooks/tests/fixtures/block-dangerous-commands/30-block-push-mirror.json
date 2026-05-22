@@ -1,5 +1,5 @@
 {
-  "name": "block git push --mirror (mirrors every ref to remote)",
+  "name": "Blocks git push --mirror, which mirrors every ref to the remote",
   "stdin": { "tool_input": { "command": "git push --mirror origin" } },
   "expect_exit": 2,
   "expect_stdout_contains": ["--mirror"]

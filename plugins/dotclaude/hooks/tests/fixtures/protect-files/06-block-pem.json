@@ -1,5 +1,5 @@
 {
-  "name": "block *.pem",
+  "name": "Blocks editing a .pem certificate file",
   "stdin": { "tool_input": { "file_path": "certs/server.pem" } },
   "expect_exit": 2
 }

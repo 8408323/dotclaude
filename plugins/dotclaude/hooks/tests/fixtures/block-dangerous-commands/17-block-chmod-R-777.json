@@ -1,5 +1,5 @@
 {
-  "name": "block chmod -R 777",
+  "name": "Blocks recursive chmod -R 777",
   "stdin": { "tool_input": { "command": "chmod -R 777 ." } },
   "expect_exit": 2
 }

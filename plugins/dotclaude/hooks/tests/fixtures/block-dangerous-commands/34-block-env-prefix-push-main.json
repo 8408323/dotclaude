@@ -1,5 +1,5 @@
 {
-  "name": "block env FOO=1 git push origin main (env-var prefix shouldn't bypass)",
+  "name": "Blocks push to main prefixed with an env command",
   "stdin": { "tool_input": { "command": "env FOO=1 git push origin main" } },
   "expect_exit": 2,
   "expect_stdout_contains": ["main"]

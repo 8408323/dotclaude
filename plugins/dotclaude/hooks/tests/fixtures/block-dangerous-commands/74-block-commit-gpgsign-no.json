@@ -1,5 +1,5 @@
 {
-  "name": "block git commit -c commit.gpgsign=no (git-config falsy value: 'no')",
+  "name": "Blocks a commit that disables signing with commit.gpgsign=no",
   "stdin": { "tool_input": { "command": "git commit -c commit.gpgsign=no -m \"x\"" } },
   "expect_exit": 2
 }

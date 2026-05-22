@@ -1,5 +1,5 @@
 {
-  "name": "allow git status; git commit -m \"x\" (real shell separator, no bypass)",
+  "name": "Allows git status chained before a plain commit",
   "stdin": { "tool_input": { "command": "git status; git commit -m \"x\"" } },
   "expect_exit": 0
 }

@@ -1,5 +1,5 @@
 {
-  "name": "allow development.env (suffix, not dotfile) -- confirm no false positive",
+  "name": "Allows editing a file whose name merely contains .env",
   "stdin": { "tool_input": { "file_path": "docs/development.env.md" } },
   "expect_exit": 0
 }

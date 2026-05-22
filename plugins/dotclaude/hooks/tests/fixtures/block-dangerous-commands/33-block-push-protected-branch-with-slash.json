@@ -1,5 +1,5 @@
 {
-  "name": "regex-metachar safety: protected name 'release/v1' blocks push to release/v1 (slash is escaped, not treated as regex)",
+  "name": "Blocks push to a protected branch whose name contains a slash",
   "stdin": { "tool_input": { "command": "git push origin release/v1" } },
   "env": { "CLAUDE_PROTECTED_BRANCHES": "main,master,release/v1" },
   "expect_exit": 2

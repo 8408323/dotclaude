@@ -1,5 +1,5 @@
 {
-  "name": "block git push --delete origin main (delete protected branch on remote)",
+  "name": "Blocks deleting the protected main branch on the remote",
   "stdin": { "tool_input": { "command": "git push --delete origin main" } },
   "expect_exit": 2,
   "expect_stdout_contains": ["main"]

@@ -5,7 +5,7 @@
 
 INPUT=$(cat 2>/dev/null)
 
-# Extract the notification message if jq is available
+# Extract the notification message from the hook input JSON when jq is available.
 MESSAGE="Claude Code needs your attention"
 if command -v jq >/dev/null 2>&1 && [ -n "$INPUT" ]; then
   MSG=$(echo "$INPUT" | jq -r '.message // empty' 2>/dev/null)
@@ -50,5 +50,5 @@ if command -v powershell.exe >/dev/null 2>&1; then
   exit 0
 fi
 
-# No notification method available. Silent exit
+# No supported notification method found on this platform; exit silently.
 exit 0

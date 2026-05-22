@@ -1,5 +1,5 @@
 {
-  "name": "block lowercase 'delete from' (case-insensitive via tolower, not GNU IGNORECASE)",
+  "name": "Blocks a lowercase delete from with no WHERE clause",
   "stdin": { "tool_input": { "command": "psql -c \"delete from users\"" } },
   "expect_exit": 2
 }

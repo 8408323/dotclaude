@@ -1,5 +1,5 @@
 {
-  "name": "block git commit --no-verify (skips pre-commit hooks per CLAUDE.md)",
+  "name": "Blocks git commit --no-verify, which skips pre-commit hooks",
   "stdin": { "tool_input": { "command": "git commit -m \"x\" --no-verify" } },
   "expect_exit": 2,
   "expect_stdout_contains": ["--no-verify"]

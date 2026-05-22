@@ -1,5 +1,5 @@
 {
-  "name": "block git commit -an (combined short flags including -n)",
+  "name": "Blocks a commit with -n bundled into combined short flags (-an)",
   "stdin": { "tool_input": { "command": "git commit -an -m \"x\"" } },
   "expect_exit": 2,
   "expect_stdout_contains": ["-n"]

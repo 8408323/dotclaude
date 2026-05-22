@@ -1,5 +1,5 @@
 {
-  "name": "--force-with-lease is allowed",
+  "name": "Allows --force-with-lease push to a feature branch",
   "stdin": { "tool_input": { "command": "git push --force-with-lease origin feature" } },
   "expect_exit": 0
 }

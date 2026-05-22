@@ -5,7 +5,8 @@
 # Used as a PreToolUse hook for Edit|Write operations.
 # Exit 2 = block the action. Exit 0 = allow.
 
-# Requires jq for JSON parsing. Fail closed if missing
+# Requires jq for JSON parsing. Fail closed (deny) if jq is missing, since this
+# hook enforces a write boundary and must not silently allow edits.
 if ! command -v jq >/dev/null 2>&1; then
   echo "{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"jq is required for file protection hooks but is not installed.\"}}"
   exit 2
@@ -18,7 +19,7 @@ if [ -z "$FILE_PATH" ]; then
   exit 0
 fi
 
-# Block dependency and build directories
+# Block writes that land inside dependency or build-output directories.
 case "$FILE_PATH" in
   node_modules/*|*/node_modules/*)
     REASON="Cannot write into node_modules/. Install dependencies via package manager instead." ;;
@@ -39,7 +40,8 @@ if [ -n "$REASON" ]; then
   exit 2
 fi
 
-# Block binary and archive file extensions. Use parameter expansion instead of
+# Block binary, archive, media, and compiled-bytecode files by extension.
+# Match against the basename via parameter expansion instead of
 # `basename` — keeps behaviour consistent with protect-files.sh and dodges the
 # BSD/macOS `basename` quirk where `--` isn't an option terminator.
 BASENAME=${FILE_PATH##*/}

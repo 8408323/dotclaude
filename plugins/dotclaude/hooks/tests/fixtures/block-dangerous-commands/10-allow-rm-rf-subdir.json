@@ -1,5 +1,5 @@
 {
-  "name": "allow rm -rf of a relative scoped subdirectory",
+  "name": "Allows rm -rf of a scoped relative subdirectory",
   "stdin": { "tool_input": { "command": "rm -rf ./build/cache" } },
   "expect_exit": 0
 }

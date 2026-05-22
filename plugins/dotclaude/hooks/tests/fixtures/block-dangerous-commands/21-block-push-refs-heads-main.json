@@ -1,5 +1,5 @@
 {
-  "name": "block push to refs/heads/main (full destination ref)",
+  "name": "Blocks push to the fully-qualified ref refs/heads/main",
   "stdin": { "tool_input": { "command": "git push origin refs/heads/main" } },
   "expect_exit": 2,
   "expect_stdout_contains": ["deny", "main"]

@@ -1,3 +1,6 @@
+# Continuous integration: validates the plugin/marketplace manifests, lints the
+# shell hooks with ShellCheck, runs the hook fixture suite, and exercises the
+# Python sync engine (unit tests plus an end-to-end dry-run into a scratch repo).
 name: CI
 
 on:

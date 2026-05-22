@@ -17,11 +17,11 @@ paths:
 
 # Database Migrations
 
-- **Never modify an existing migration.** Always create a new migration for changes. Existing migrations may have already run in production.
-- Every migration must be reversible. Implement both up/forward and down/rollback.
+- **Never modify an existing migration.** Make every change in a new one — existing migrations may have already run in production.
+- Every migration must be reversible: implement both the up/forward and down/rollback paths.
 - Test migrations in both directions before committing.
-- Migration filenames are ordered by timestamp prefix. New migrations go at the end.
-- Never use raw SQL when the ORM or migration tool provides a method for the operation.
-- Never seed production data in migration files. Use dedicated seed files.
-- Never drop columns or tables without first confirming the data is no longer needed.
-- Add indexes in their own migration, not bundled with schema changes. Easier to roll back independently.
+- Migration filenames are ordered by their timestamp prefix, so new migrations go at the end.
+- Don't use raw SQL when the ORM or migration tool provides a method for the operation.
+- Don't seed production data in migration files; use dedicated seed files.
+- Don't drop columns or tables without first confirming the data is no longer needed.
+- Put each index in its own migration rather than bundling it with schema changes, so it can be rolled back independently.

@@ -5,9 +5,9 @@ alwaysApply: true
 
 # Testing
 
-- Verify behavior, not implementation. Don't assert mock call counts when output values would do.
-- Run the specific test file after changes, not the full suite. Faster feedback, fewer tokens.
-- Flaky test? Fix it or delete it. Never retry to make it pass.
+- Verify behavior, not implementation. Don't assert mock call counts when checking output values would do.
+- After a change, run the specific test file rather than the full suite — faster feedback, fewer tokens.
+- Flaky test? Fix it or delete it. Never retry it to make it pass.
 - Prefer real implementations. Mock only at system boundaries (network, filesystem, clock, randomness, real hardware).
-- Keep each test focused on one behavior. Multiple `assert`s in one test are fine when they verify aspects of the same observed output. Test names describe one behavior. Arrange-Act-Assert.
-- Never `assert True` / `expect(true)` or check a mock was called without verifying arguments.
+- Keep each test focused on one behavior. Multiple `assert`s in one test are fine when they verify aspects of the same observed output. Name tests for the one behavior they cover, and follow Arrange-Act-Assert.
+- Never use `assert True` / `expect(true)`, and never check that a mock was called without verifying its arguments.

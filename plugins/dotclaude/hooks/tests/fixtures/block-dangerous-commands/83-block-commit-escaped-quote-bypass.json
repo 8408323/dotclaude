@@ -1,5 +1,5 @@
 {
-  "name": "block git commit -m \"fix \\\" & note\" --no-verify (escaped quote inside message before separator)",
+  "name": "Blocks --no-verify when an escaped quote in the message tries to bypass parsing",
   "stdin": { "tool_input": { "command": "git commit -m \"fix \\\" & note\" --no-verify" } },
   "expect_exit": 2,
   "expect_stdout_contains": ["--no-verify"]

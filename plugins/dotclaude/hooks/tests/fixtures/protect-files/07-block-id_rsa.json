@@ -1,5 +1,5 @@
 {
-  "name": "block id_rsa",
+  "name": "Blocks editing an id_rsa private key",
   "stdin": { "tool_input": { "file_path": "/home/me/.ssh/id_rsa" } },
   "expect_exit": 2
 }

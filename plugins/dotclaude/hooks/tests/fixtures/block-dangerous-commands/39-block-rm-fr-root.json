@@ -1,5 +1,5 @@
 {
-  "name": "block rm -fr / (flag order f-then-r, swapped from rf)",
+  "name": "Blocks rm of root with reversed -fr flag order",
   "stdin": { "tool_input": { "command": "rm -fr /" } },
   "expect_exit": 2
 }

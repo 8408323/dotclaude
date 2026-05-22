@@ -9,21 +9,21 @@ Explain `$ARGUMENTS` clearly.
 
 ## Mode
 
-If `$ARGUMENTS` includes the word `verbose` (for example, `/explain my-function verbose`), produce all five sections below. Strip the word `verbose` from the target name when interpreting what to explain.
+If `$ARGUMENTS` includes the word `verbose` (for example, `/explain my-function verbose`), produce all five sections below. Strip the word `verbose` from the target name when deciding what to explain.
 
-Otherwise (the default), produce only sections 1 and 2 and stop. Day-to-day that's usually all you need.
+Otherwise (the default), produce only sections 1 and 2, then stop. Day-to-day, that's usually all you need.
 
 ## Sections
 
 ### 1. One-sentence summary
-What does it do, and why does it exist? One sentence.
+In one sentence: what does it do, and why does it exist?
 
 ### 2. Mental model
-An analogy or metaphor that captures the core idea. Relate it to something the developer already knows. One short paragraph.
+One short paragraph: an analogy or metaphor that captures the core idea, tied to something the developer already knows.
 
 ### 3. Visual diagram (verbose only)
 
-Draw an ASCII diagram showing the data and control flow. Keep it readable:
+Draw an ASCII diagram of the data and control flow. Keep it readable:
 
 ```
 Input -> [Step A] -> [Step B] -> Output
@@ -34,7 +34,7 @@ Input -> [Step A] -> [Step B] -> Output
 
 ### 4. Key details (verbose only)
 
-Walk through the important parts. Skip the obvious. Focus on:
+Walk through the important parts and skip the obvious ones. Focus on:
 
 - Non-obvious decisions (why this approach?)
 - Edge cases and gotchas
@@ -42,4 +42,4 @@ Walk through the important parts. Skip the obvious. Focus on:
 
 ### 5. How to modify it (verbose only)
 
-What would someone need to know to safely change this code? Where are the landmines?
+What does someone need to know to change this code safely, and where are the landmines?

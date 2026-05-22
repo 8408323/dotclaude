@@ -3,7 +3,8 @@
 # Used as a PreToolUse hook for Edit|Write operations.
 # Exit 2 = block. Exit 0 = allow.
 
-# Requires jq for JSON parsing. Allow if missing (don't block the user)
+# Requires jq for JSON parsing. If jq is missing, allow the write rather than
+# block it — this hook is an advisory secret check, not a hard boundary.
 if ! command -v jq >/dev/null 2>&1; then
   exit 0
 fi
@@ -11,7 +12,8 @@ fi
 INPUT=$(cat)
 TOOL_NAME=$(echo "$INPUT" | jq -r '.tool_name // empty')
 
-# Extract the content being written
+# Extract the content being written (Write sends full content; Edit sends the
+# replacement text). Anything else is not a content-bearing tool, so allow it.
 if [ "$TOOL_NAME" = "Write" ]; then
   CONTENT=$(echo "$INPUT" | jq -r '.tool_input.content // empty')
 elif [ "$TOOL_NAME" = "Edit" ]; then
@@ -72,7 +74,8 @@ if echo "$CONTENT" | grep -qiE '(password|secret|token|api_key|apikey|api_secret
 fi
 
 if [ -n "$MATCHES" ]; then
-  # Use "ask" not "deny". Warn the user but let them override (could be test fixtures)
+  # Use "ask" rather than "deny": warn the user but let them override, since a
+  # match can be a false positive (e.g. a dummy key in a test fixture).
   REASON="Possible secret detected in content:$MATCHES Review carefully before allowing."
   echo "{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"ask\",\"permissionDecisionReason\":\"$REASON\"}}"
   exit 2

@@ -1,5 +1,5 @@
 {
-  "name": "ordinary source file allowed",
+  "name": "Allows editing an ordinary source file",
   "stdin": { "tool_input": { "file_path": "src/index.ts" } },
   "expect_exit": 0
 }

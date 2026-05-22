@@ -1,5 +1,5 @@
 {
-  "name": "block rm -rf -- / (POSIX option terminator before target)",
+  "name": "Blocks rm -rf of root with a -- option terminator before the target",
   "stdin": { "tool_input": { "command": "rm -rf -- /" } },
   "expect_exit": 2
 }
