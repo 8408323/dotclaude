@@ -212,6 +212,14 @@ def generate_copilot(rules_dir: Path, header_tpl: Path, root: Path, rep: Report,
 # Skills that are Claude-Code-specific and don't translate to a Copilot prompt.
 SKILL_PROMPT_SKIP = {"context-budget", "dotclaude-init"}
 
+# Claude-Code-isms rewritten when generating Copilot prompts (longest keys first).
+PROMPT_REWRITES = {
+    "$ARGUMENTS": "${input:args}",
+    "AskUserQuestion tool": "an interactive confirmation",
+    "AskUserQuestion": "an interactive confirmation",
+    "/dotclaude:": "/",
+}
+
 
 def split_frontmatter(text: str):
     """Return ({key: value}, body) for a markdown file with simple `key: value` frontmatter.
@@ -248,8 +256,10 @@ def generate_copilot_prompts(skills_dir: Path, root: Path, rep: Report, dry: boo
             continue
         fields, body = split_frontmatter(skill.read_text())
         desc = fields.get("description", d.name)
-        body = body.replace("$ARGUMENTS", "${input:args}")
-        out = (f"---\nmode: agent\ndescription: {json.dumps(desc)}\n---\n"
+        for old, new in PROMPT_REWRITES.items():
+            body = body.replace(old, new)
+        # GitHub Copilot prompt files select agent mode via the `agent` key (not `mode`).
+        out = (f"---\nagent: 'agent'\ndescription: {json.dumps(desc)}\n---\n"
                f"{_derived_marker(d.name + ' skill')}\n\n{body}\n")
         write_managed(root / ".github" / "prompts" / f"{d.name}.prompt.md", out, root, rep, dry)
 
