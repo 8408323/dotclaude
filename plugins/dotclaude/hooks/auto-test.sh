@@ -24,7 +24,8 @@ BASENAME=${FILE_PATH##*/}
 EXTENSION="${BASENAME##*.}"
 NAME="${BASENAME%.*}"
 DIR=${FILE_PATH%/*}
-# If $FILE_PATH had no `/`, `${FILE_PATH%/*}` returns the whole thing — fall back to "." in that case.
+# If $FILE_PATH contained no `/`, the `%/*` expansion leaves it unchanged
+# (it's a bare filename in the current directory) — fall back to "." then.
 [ "$DIR" = "$FILE_PATH" ] && DIR="."
 
 # Skip if the edited file IS a test file.
@@ -42,7 +43,8 @@ case "$FILE_PATH" in
   */.claude/*|*/public/*|*/static/*|*/assets/*|*/__mocks__/*) exit 0 ;;
 esac
 
-# Find project root.
+# Walk up from $PWD to the nearest directory holding a recognized project
+# manifest or a .git entry; print it. Falls back to $PWD if none is found.
 find_project_root() {
   local dir="$PWD"
   while [ "$dir" != "/" ]; do
@@ -58,7 +60,8 @@ find_project_root() {
 ROOT=$(find_project_root)
 STEM="$NAME"
 
-# Search for a matching test file in the usual conventions.
+# Locate the test file matching the edited source file by trying the common
+# naming conventions in order of likelihood, printing the first match found.
 find_test_file() {
   local stem="$1"
   local ext="$2"

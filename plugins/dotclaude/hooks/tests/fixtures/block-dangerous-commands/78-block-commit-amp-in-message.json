@@ -1,5 +1,5 @@
 {
-  "name": "block git commit -m \"fix & note\" --no-verify (& inside quoted message)",
+  "name": "Blocks --no-verify even when the message contains an ampersand",
   "stdin": { "tool_input": { "command": "git commit -m \"fix & note\" --no-verify" } },
   "expect_exit": 2
 }

@@ -1,5 +1,5 @@
 {
-  "name": "block deep/.env",
+  "name": "Blocks editing a .env file in a nested directory",
   "stdin": { "tool_input": { "file_path": "apps/web/.env" } },
   "expect_exit": 2
 }

@@ -1,5 +1,5 @@
 {
-  "name": "block rm -rf /",
+  "name": "Blocks rm -rf of the root directory",
   "stdin": { "tool_input": { "command": "rm -rf /" } },
   "expect_exit": 2
 }

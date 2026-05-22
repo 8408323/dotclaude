@@ -1,5 +1,5 @@
 {
-  "name": "block git clean --force -d (long --force form)",
+  "name": "Blocks git clean using the long --force flag",
   "stdin": { "tool_input": { "command": "git clean --force -d" } },
   "expect_exit": 2
 }

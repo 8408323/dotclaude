@@ -1,5 +1,5 @@
 {
-  "name": "block git push --force-with-lease origin main (long flag before remote)",
+  "name": "Blocks --force-with-lease push to main",
   "stdin": { "tool_input": { "command": "git push --force-with-lease origin main" } },
   "expect_exit": 2,
   "expect_stdout_contains": ["deny", "main"]

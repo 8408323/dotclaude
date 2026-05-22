@@ -1,5 +1,5 @@
 {
-  "name": "block git push -u origin main (push options before remote)",
+  "name": "Blocks push to main with a -u flag before the remote",
   "stdin": { "tool_input": { "command": "git push -u origin main" } },
   "expect_exit": 2,
   "expect_stdout_contains": ["deny", "main"]

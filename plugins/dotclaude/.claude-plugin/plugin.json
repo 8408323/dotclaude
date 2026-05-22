@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-plugin.json",
   "name": "dotclaude",
-  "description": "Guardrail hooks, reviewer subagents, and workflow skills for Claude Code, plus /dotclaude:init to scaffold the project-local config layer (rules, settings baseline, CLAUDE.md block, GitHub AI-review workflows).",
+  "description": "Safety-guardrail hooks, code-review subagents, and workflow skills for Claude Code, plus /dotclaude:init to scaffold a project's local config layer (rules, a settings baseline, a CLAUDE.md block, and GitHub AI-review workflows).",
   "author": {
     "name": "Jonathan Haraldsson"
   },

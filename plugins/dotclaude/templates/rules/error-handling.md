@@ -9,9 +9,9 @@ paths:
 # Error Handling
 
 - Use typed or custom error classes with codes, not a generic catch-all error.
-- Never swallow errors silently. Re-raise with added context about which operation failed, or log at the right level.
-- Handle every rejected promise / awaited call. No fire-and-forget async.
-- Error responses: consistent shape, correct status codes (400 validation, 401 auth, 404 not found, 500 unexpected).
+- Never swallow errors silently. Re-raise them with added context about which operation failed, or log them at the right level.
+- Handle every rejected promise and awaited call. No fire-and-forget async.
+- Give error responses a consistent shape and correct status codes (400 validation, 401 auth, 404 not found, 500 unexpected).
 - Never expose stack traces, internal paths, or raw backend errors to the caller.
 - Retry transient errors (network timeouts, rate limits) with exponential backoff. Fail fast on validation and auth errors — don't retry them.
 - Include correlation or request IDs in error logs when available.

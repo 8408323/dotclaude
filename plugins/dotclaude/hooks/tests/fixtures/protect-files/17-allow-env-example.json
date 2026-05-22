@@ -1,5 +1,5 @@
 {
-  "name": ".env.example must remain editable (tracked template, not a secret)",
+  "name": "Allows editing the .env.example template",
   "stdin": { "tool_input": { "file_path": ".env.example" } },
   "expect_exit": 0
 }

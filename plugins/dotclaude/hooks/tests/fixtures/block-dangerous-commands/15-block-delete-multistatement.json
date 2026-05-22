@@ -1,5 +1,5 @@
 {
-  "name": "DELETE without WHERE followed by unrelated WHERE in later statement must still block",
+  "name": "Blocks a WHERE-less DELETE even when a later statement has its own WHERE",
   "stdin": { "tool_input": { "command": "psql <<EOF\nDELETE FROM users;\nSELECT * FROM logs WHERE id=1;\nEOF" } },
   "expect_exit": 2
 }

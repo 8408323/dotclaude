@@ -1,5 +1,5 @@
 {
-  "name": "allow echo \"rm -rf /\" (quoted string, not an invocation)",
+  "name": "Allows echo of a quoted rm -rf string that is not executed",
   "stdin": { "tool_input": { "command": "echo \"rm -rf /\"" } },
   "expect_exit": 0
 }

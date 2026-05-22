@@ -5,13 +5,13 @@
     "name": "Jonathan Haraldsson"
   },
   "metadata": {
-    "description": "Reusable Claude Code engine: guardrail hooks, reviewer agents, and workflow skills, plus an init skill that scaffolds the project-local config layer."
+    "description": "A reusable Claude Code engine: safety-guardrail hooks, code-review agents, and workflow skills, plus an init skill that scaffolds a project's own local config layer."
   },
   "plugins": [
     {
       "name": "dotclaude",
       "source": "./plugins/dotclaude",
-      "description": "Guardrail hooks, reviewer subagents, workflow skills, and /dotclaude:init to scaffold rules, settings, CLAUDE.md, and GitHub AI-review workflows into a project.",
+      "description": "Safety-guardrail hooks, code-review subagents, and workflow skills, plus /dotclaude:init to scaffold rules, a settings baseline, a CLAUDE.md block, and GitHub AI-review workflows into a project.",
       "author": {
         "name": "Jonathan Haraldsson"
       }

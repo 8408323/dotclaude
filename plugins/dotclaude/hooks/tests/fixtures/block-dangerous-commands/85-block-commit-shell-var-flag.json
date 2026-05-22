@@ -1,5 +1,5 @@
 {
-  "name": "block NV=-n; git commit $NV -m x (shell-var expansion as flag at exec time)",
+  "name": "Blocks a commit whose flag is supplied via a shell variable",
   "stdin": { "tool_input": { "command": "NV=-n; git commit $NV -m \"x\"" } },
   "expect_exit": 2,
   "expect_stdout_contains": ["shell-expanded"]

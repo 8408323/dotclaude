@@ -1,5 +1,5 @@
 {
-  "name": "block git --no-pager push --all (long global option before subcommand)",
+  "name": "Blocks push --all with a --no-pager global option before the subcommand",
   "stdin": { "tool_input": { "command": "git --no-pager push --all" } },
   "expect_exit": 2,
   "expect_stdout_contains": ["--all"]

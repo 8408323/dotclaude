@@ -1,8 +1,8 @@
 # dotclaude
 
-A reusable Claude Code dev environment — guardrail hooks, reviewer subagents, and workflow skills — packaged as a **plugin + marketplace**, with an `init` skill that scaffolds the project-local config a plugin can't ship (rules, settings baseline, `CLAUDE.md` block, GitHub AI-review workflows).
+A reusable Claude Code dev environment — guardrail hooks, reviewer subagents, and workflow skills — shipped as a **plugin + marketplace**. An `init` skill scaffolds the project-local config a plugin can't carry on its own: rules, a settings baseline, a `CLAUDE.md` block, and GitHub AI-review workflows.
 
-One generic layer, reused across repos; a thin project-specific layer that **never clashes** with it. See [PLAN.md](PLAN.md) for the design and the ownership model.
+The result is one generic layer reused across every repo, plus a thin project-specific layer that **never clashes** with it. See [PLAN.md](PLAN.md) for the design and the ownership model.
 
 ## Install
 
@@ -14,15 +14,15 @@ One generic layer, reused across repos; a thin project-specific layer that **nev
 /reload-plugins
 ```
 
-`/dotclaude:init --dry-run` previews changes. `--no-github` skips workflow templates; `--no-rules` skips base rules.
+Use `/dotclaude:init --dry-run` to preview changes. `--no-github` skips the workflow templates; `--no-rules` skips the base rules.
 
 ## What you get
 
-- **Hooks** (auto): secret scan, dangerous-command block, file protection, build-artifact block, format-on-save, auto-test, session-start context, post-compaction recovery, desktop notify.
+- **Hooks** (run automatically): secret scan, dangerous-command block, file protection, build-artifact block, format-on-save, auto-test, session-start context, post-compaction recovery, desktop notify.
 - **Agents**: `@security-reviewer`, `@code-reviewer`, `@performance-reviewer`, `@doc-reviewer`, `@frontend-designer`.
 - **Skills**: `/dotclaude:tdd`, `/dotclaude:ship`, `/dotclaude:debug-fix`, `/dotclaude:pr-review`, `/dotclaude:refactor`, `/dotclaude:explain`, `/dotclaude:test-writer`, `/dotclaude:context-budget`, `/dotclaude:init`.
-- **Base rules** + **settings baseline** + **CLAUDE.md block** + **AGENTS.md** + **GitHub AI-review workflows**, scaffolded by `/dotclaude:init`.
-- **Copilot layer generated from one source** — `.github/copilot-instructions.md` + `.github/instructions/*` (from the rules), `.github/prompts/*.prompt.md` (from the workflow skills), and `.github/agents/*.md` (from the reviewer agents). Claude and Copilot stay in sync because they're generated, not hand-duplicated.
+- **Base rules**, a **settings baseline**, a **CLAUDE.md block**, an **AGENTS.md**, and **GitHub AI-review workflows**, all scaffolded by `/dotclaude:init`.
+- **A Copilot layer generated from a single source** — `.github/copilot-instructions.md` and `.github/instructions/*` from the rules, `.github/prompts/*.prompt.md` from the workflow skills, and `.github/agents/*.md` from the reviewer agents. Because these are generated rather than hand-duplicated, Claude and Copilot stay in sync.
 - **Plans**: generic playbooks ship in the plugin (`templates/plans/`); project plans live in the gitignored `.claude/plans/`.
 
 ## Updating
@@ -34,7 +34,7 @@ One generic layer, reused across repos; a thin project-specific layer that **nev
 
 ## Ownership in one line
 
-Files marked `dotclaude:managed` are regenerated on init; delete a file's marker to take local ownership and dotclaude will leave it alone. `settings.json` is additive-merged. `CLAUDE.md` changes are confined to the dotclaude block.
+Files marked `dotclaude:managed` are regenerated on init. Delete a file's marker to take local ownership, and dotclaude leaves it alone. `settings.json` is merged additively, and `CLAUDE.md` edits stay inside the dotclaude block.
 
 ## Develop
 

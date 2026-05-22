@@ -1,5 +1,5 @@
 {
-  "name": "block .ENV (case-insensitive)",
+  "name": "Blocks editing .ENV regardless of case",
   "stdin": { "tool_input": { "file_path": ".ENV" } },
   "expect_exit": 2
 }

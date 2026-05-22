@@ -1,5 +1,5 @@
 {
-  "name": "block git commit --no-gpg-sig (abbreviated long-option for --no-gpg-sign)",
+  "name": "Blocks a commit using the abbreviated --no-gpg-sig form of --no-gpg-sign",
   "stdin": { "tool_input": { "command": "git commit --no-gpg-sig -m \"x\"" } },
   "expect_exit": 2,
   "expect_stdout_contains": ["--no-g"]

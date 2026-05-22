@@ -1,5 +1,5 @@
 {
-  "name": "block file inside .git/",
+  "name": "Blocks editing a file inside the .git directory",
   "stdin": { "tool_input": { "file_path": "/repo/.git/config" } },
   "expect_exit": 2
 }

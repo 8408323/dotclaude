@@ -5,7 +5,7 @@ argument-hint: "[--api]"
 disable-model-invocation: true
 ---
 
-Estimate the token cost of this project's `.claude/` configuration and `CLAUDE.md` so the user can see exactly which files load every turn versus only when triggered.
+Estimate the token cost of this project's `.claude/` configuration and `CLAUDE.md`, so the user can see which files load on every turn versus only when triggered.
 
 ## Step 1: Discover loadable files
 
@@ -19,7 +19,7 @@ find .claude/agents -name '*.md' -type f 2>/dev/null
 [ -f .claude/CLAUDE.md ] && echo "WARN: .claude/CLAUDE.md exists. CLAUDE.md belongs at the project root."
 ```
 
-Skip any file under `.claude/agents/README.md`, `.claude/rules/README.md`, etc. Those are folder descriptions, not loaded by Claude Code at runtime.
+Skip README files such as `.claude/agents/README.md` and `.claude/rules/README.md`. They are folder descriptions, and Claude Code does not load them at runtime.
 
 ## Step 2: Classify rules by frontmatter
 
@@ -31,21 +31,21 @@ For every `.md` file in `.claude/rules/`, read the YAML frontmatter (the block b
 | `paths: [...]` | Path-scoped | Loaded only when working near matched files |
 | Neither | Defaults to always-loaded; flag for review | Every turn |
 
-Other categories:
-- `./CLAUDE.md` -> always-loaded (by definition).
-- `.claude/skills/<name>/SKILL.md` -> invoked-only (zero per-turn cost; only loads when the user runs `/skill-name` or, if `disable-model-invocation` is unset, when Claude auto-triggers it).
-- `.claude/agents/<name>.md` -> invoked-only and runs in isolated context (per-invocation cost in its own session, not per-turn cost in the main thread).
+The other categories:
+- `./CLAUDE.md` -> always-loaded, by definition.
+- `.claude/skills/<name>/SKILL.md` -> invoked-only, with zero per-turn cost. It loads only when the user runs `/skill-name`, or, if `disable-model-invocation` is unset, when Claude auto-triggers it.
+- `.claude/agents/<name>.md` -> invoked-only and runs in isolated context. Its cost is per-invocation in its own session, not per-turn in the main thread.
 
 ## Step 3: Count tokens per file
 
-Default mode (no API call): chars-based heuristic. Anthropic documents that English text averages roughly 4 characters per token. Compute:
+Default mode (no API call) uses a character-based heuristic. Anthropic documents that English text averages roughly 4 characters per token, so compute:
 
 ```bash
 chars=$(wc -c < "$FILE" | tr -d ' ')
 tokens=$((chars / 4))
 ```
 
-Note this in the report so the user knows the count is approximate (within roughly 10 to 15 percent of the exact count for typical config text).
+Note this in the report so the user knows the count is approximate — typically within 10 to 15 percent of the exact count for config text.
 
 `--api` mode: if `$ARGUMENTS` contains `--api`:
 
@@ -63,11 +63,11 @@ else
 fi
 ```
 
-The endpoint returns Anthropic's exact tokenizer count. That is the factual number Claude Code itself would see when loading the file.
+The endpoint returns Anthropic's exact tokenizer count — the same number Claude Code itself sees when it loads the file.
 
 ## Step 4: Aggregate and report
 
-Sum tokens within each category, identify the top 3 contributors among always-loaded files, then print:
+Sum the tokens in each category, identify the top 3 contributors among the always-loaded files, then print:
 
 ```
 Context budget for <project root>
@@ -95,7 +95,7 @@ Top 3 always-loaded contributors:
 Verdict: PASS / NEAR LIMIT / OVER BUDGET
 ```
 
-End the report with the highest-leverage trim recommendation if any class is over budget.
+If any class is over budget, end the report with the single highest-leverage trim recommendation.
 
 ## Budget guidance (used to compute the verdict)
 
@@ -108,8 +108,8 @@ End the report with the highest-leverage trim recommendation if any class is ove
 ## Caveats to mention in the report
 
 - The heuristic is approximate. Re-run with `--api` (requires `$ANTHROPIC_API_KEY`) for the exact count from Anthropic's tokenizer.
-- Claude Code does not expose live context window state to skills, so this report estimates "what would load each turn for this configuration", not "what's currently in your session window".
+- Claude Code does not expose live context-window state to skills, so this report estimates what would load each turn for this configuration — not what's currently in your session window.
 - Agents run in isolated context. Their prompt cost is per-invocation in their own session, not per-turn in your main thread.
-- Skills cost zero until invoked. Most have `disable-model-invocation: true`, meaning they only fire on `/name`.
+- Skills cost zero until invoked. Most carry `disable-model-invocation: true`, so they fire only on `/name`.
 - Path-scoped rules cost zero unless the conversation touches files matching their globs.
-- Hooks contribute to context only if they print to stdout. dotclaude's hooks are silent on success by design.
+- Hooks add to context only when they print to stdout. dotclaude's hooks are silent on success by design.

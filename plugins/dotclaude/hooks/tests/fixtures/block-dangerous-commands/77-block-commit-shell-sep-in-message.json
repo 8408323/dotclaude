@@ -1,5 +1,5 @@
 {
-  "name": "block git commit -m \"fix; note\" --no-verify (shell-sep inside quoted message used to split segment)",
+  "name": "Blocks --no-verify even when the message contains a semicolon",
   "stdin": { "tool_input": { "command": "git commit -m \"fix; note\" --no-verify" } },
   "expect_exit": 2,
   "expect_stdout_contains": ["--no-verify"]

@@ -1,5 +1,5 @@
 {
-  "name": "block bash -lc 'git push origin main' (shell-wrapper bypass)",
+  "name": "Blocks a push to main wrapped in bash -lc",
   "stdin": { "tool_input": { "command": "bash -lc 'git push origin main'" } },
   "expect_exit": 2,
   "expect_stdout_contains": ["main"]

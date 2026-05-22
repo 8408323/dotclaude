@@ -1,5 +1,5 @@
 {
-  "name": "block git -c commit.gpgsign=false commit (git-level -c BEFORE subcommand — the actual signing-bypass form)",
+  "name": "Blocks a commit that disables signing via git -c commit.gpgsign=false",
   "stdin": { "tool_input": { "command": "git -c commit.gpgsign=false commit -m \"x\"" } },
   "expect_exit": 2,
   "expect_stdout_contains": ["commit.gpgsign"]

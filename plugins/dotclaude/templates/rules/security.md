@@ -8,11 +8,11 @@ paths:
 
 # Security
 
-- Validate all external input at the system boundary. Never trust request parameters, env, or data decoded from another process/device.
+- Validate all external input at the system boundary. Never trust request parameters, environment variables, or data decoded from another process or device.
 - Use parameterized queries. Never concatenate input into SQL or shell commands.
-- Sanitize output to prevent injection/XSS. Use framework-provided escaping.
-- Authentication tokens must be short-lived. Store refresh tokens server-side only; never persist long-lived secrets in plain config.
+- Sanitize output to prevent injection and XSS, using framework-provided escaping.
+- Keep authentication tokens short-lived. Store refresh tokens server-side only, and never persist long-lived secrets in plain config.
 - Never log secrets, tokens, passwords, or PII.
 - Never commit credentials or captured traffic.
 - Use constant-time comparison for secrets and tokens.
-- Verify TLS on outbound connections. Only disable verification in an explicit, gitignored capture/debug script.
+- Verify TLS on outbound connections. Disable verification only in an explicit, gitignored capture or debug script.

@@ -1,15 +1,15 @@
 # Hooks
 
-Hook scripts are deterministic enforcement. Unlike rules (advisory), hooks **guarantee** behavior by blocking or modifying tool calls before or after they execute.
+Hooks are deterministic enforcement. Rules are advisory, but hooks **guarantee** behavior by blocking or modifying tool calls before or after they run.
 
-Hooks are wired in `settings.json` under the `"hooks"` key. Each hook specifies an event, a matcher, and a command to run.
+You wire hooks into `settings.json` under the `"hooks"` key. Each one specifies an event, a matcher, and a command to run.
 
 ## Available hooks
 
 ### protect-files.sh
 **Event**: PreToolUse (`Edit` | `Write`)
 
-Blocks edits to sensitive and generated files. Fails closed (blocks if `jq` is missing).
+Blocks edits to sensitive and generated files. Fails closed (it blocks if `jq` is missing).
 
 - `.env`, `.env.*`. Secrets, by basename and path.
 - `*.pem`, `*.key`, `*.crt`, `*.p12`, `*.pfx`. Certificates and keys.
@@ -23,7 +23,7 @@ Blocks edits to sensitive and generated files. Fails closed (blocks if `jq` is m
 ### block-build-artifacts.sh
 **Event**: PreToolUse (`Edit` | `Write`)
 
-Blocks writes to build artifacts, dependency directories, and binary files (hard `deny`, not a warning — these aren't files to be hand-edited). Fails closed.
+Blocks writes to build artifacts, dependency directories, and binary files. This is a hard `deny`, not a warning — these aren't files you hand-edit. Fails closed.
 
 - `node_modules/`, `vendor/`, `dist/`, `build/`, `.next/`, `__pycache__/`, `.venv/`.
 - `*.wasm`, `*.so`, `*.dylib`, `*.dll`, `*.exe`, `*.zip`, `*.tar.*`.
@@ -32,7 +32,7 @@ Blocks writes to build artifacts, dependency directories, and binary files (hard
 ### block-dangerous-commands.sh
 **Event**: PreToolUse (`Bash`)
 
-Blocks dangerous shell commands. Detects patterns even in chained commands (`&&`, `;`). Fails closed.
+Blocks dangerous shell commands, detecting the patterns even inside chained commands (`&&`, `;`). Fails closed.
 
 - **Git**: `git push origin main/master`, `git push --force` (allows `--force-with-lease`), bare `git push` on main.
 - **Filesystem**: `rm -rf /`, `rm -rf ~`, recursive delete on root/home paths.
@@ -42,7 +42,7 @@ Blocks dangerous shell commands. Detects patterns even in chained commands (`&&`
 ### format-on-save.sh
 **Event**: PostToolUse (`Edit` | `Write`)
 
-Auto-formats files after Claude edits them. Auto-detects formatters by checking for both the binary and a config file:
+Formats files after Claude edits them. Detects a formatter by checking for both its binary and a config file:
 
 - Biome: `biome.json` plus `node_modules/.bin/biome`.
 - Prettier: `.prettierrc*` or `package.json` prettier key plus `node_modules/.bin/prettier`.
@@ -56,16 +56,16 @@ Auto-formats files after Claude edits them. Auto-detects formatters by checking 
 
 Injects dynamic project context at session start.
 
-**Default (minimal, ~5 to 10 tokens)**: current branch (or detached HEAD warning) and a `dirty` tag if there are uncommitted changes. That's it. No network calls, no extra detail.
+**Default (minimal, ~5 to 10 tokens)**: the current branch (or a detached-HEAD warning) and a `dirty` tag when there are uncommitted changes. Nothing more — no network calls, no extra detail.
 
 **Verbose**: set `DOTCLAUDE_SESSION_VERBOSE=1` in your shell to also emit:
 - Last commit oneline.
 - Uncommitted file count.
 - Staged indicator.
 - Stash count.
-- Active PR info via `gh` (adds a network round-trip).
+- Active PR info via `gh` (this adds a network round-trip).
 
-The verbose payload runs ~30 to 90 tokens per session. Default is recommended for daily iterative work where every new conversation pays this cost.
+The verbose payload costs ~30 to 90 tokens per session. The default is recommended for daily iterative work, where every new conversation pays this cost.
 
 ## Adding your own
 
@@ -92,7 +92,7 @@ The verbose payload runs ~30 to 90 tokens per session. Default is recommended fo
 ```
 
 - Exit 0 to allow, exit 2 to block.
-- Scripts receive JSON on stdin with `tool_input`.
-- Requires `jq` for JSON parsing.
+- Scripts receive JSON on stdin, including `tool_input`.
+- `jq` is required for JSON parsing.
 
-See [Claude Code docs](https://code.claude.com/docs/en/hooks) for all hook events.
+See the [Claude Code docs](https://code.claude.com/docs/en/hooks) for the full list of hook events.

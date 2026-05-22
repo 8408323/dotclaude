@@ -1,5 +1,5 @@
 {
-  "name": "block rm -Rf / (capital R is GNU rm's equivalent of -r)",
+  "name": "Blocks rm of root using the uppercase -Rf recursion flag",
   "stdin": { "tool_input": { "command": "rm -Rf /" } },
   "expect_exit": 2
 }

@@ -1,5 +1,5 @@
 {
-  "name": "block git commit --message=\"fix & note\" --no-verify (equals form with quoted value)",
+  "name": "Blocks --no-verify with an --message= form whose value has an ampersand",
   "stdin": { "tool_input": { "command": "git commit --message=\"fix & note\" --no-verify" } },
   "expect_exit": 2,
   "expect_stdout_contains": ["--no-verify"]

@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
-# Bootstrap dotclaude into a project without the interactive /plugin flow.
+# Install dotclaude into a project without going through the interactive /plugin UI.
 #
-# Adds the marketplace + enables the plugin via the Claude Code CLI (if present),
-# then scaffolds the project-local layer with the bundled sync engine.
+# Registers this marketplace and enables the plugin through the Claude Code CLI
+# (when it is available), then scaffolds the project-local config layer using the
+# bundled sync engine.
 #
 # Usage:  scripts/install.sh [target-project-dir] [-- <sync.py flags>]
-# Run from a clone of this repo. Re-runnable.
+# Run it from a clone of this repo. Safe to re-run.
 
 set -euo pipefail
 

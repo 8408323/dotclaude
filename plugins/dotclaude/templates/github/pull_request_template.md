@@ -16,4 +16,4 @@
 - [ ] Tests added/updated and the relevant suite passes
 - [ ] No secrets, tokens, or captured traffic committed
 - [ ] Scope is tight — no unrelated refactors
-- [ ] Review loop: after the first round of comments, address each, resolve the thread (or reply if it needs more info), then re-request review; don't merge until reviewers are clear
+- [ ] Review loop: after the first round of comments, address each one, resolve the thread (or reply if it needs more info), then re-request review. Don't merge until reviewers are clear

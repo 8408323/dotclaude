@@ -1,12 +1,12 @@
 # dotclaude — design & plan
 
-A reusable Claude Code "AI dev environment" shared across repos, with a clean split between a **generic layer** and a **project-specific layer** that never clash.
+A reusable Claude Code "AI dev environment" shared across repos. It cleanly separates a **generic layer** from a **project-specific layer** so the two never clash.
 
 ## Why this shape
 
-Research (May 2026) points to the native **plugin + marketplace** model as the current best practice for reuse-across-repos: versioned, auto-updating (`/plugin update`), and — unlike git submodules/subtrees — it puts nothing into a consuming project's history.
+As of May 2026, the native **plugin + marketplace** model is the best practice for reuse across repos: it's versioned, it auto-updates (`/plugin update`), and — unlike git submodules or subtrees — it adds nothing to a consuming project's history.
 
-But a Claude Code plugin can only ship part of the picture:
+A Claude Code plugin, however, can only ship part of the picture:
 
 | Component | Shippable in a plugin? |
 |---|---|
@@ -16,14 +16,14 @@ But a Claude Code plugin can only ship part of the picture:
 | `CLAUDE.md` | ❌ project-owned |
 | `.github/` workflows (AI review) | ❌ GitHub-side, not a Claude Code component |
 
-So dotclaude is a **hybrid**:
+So dotclaude is a **hybrid** of two parts:
 
-1. **Engine = a plugin** (`plugins/dotclaude/`) shipping hooks + agents + skills. Installed from this repo (which is also the marketplace). Updates natively, namespaced (`/dotclaude:*`), never written into the project tree.
-2. **Project-local layer = templates + an `init` skill.** `/dotclaude:init` runs a deterministic sync engine that scaffolds the things a plugin can't carry: base rules, a settings baseline, a `CLAUDE.md` block, an `AGENTS.md`, Copilot instructions, and the GitHub AI-review workflows.
+1. **The engine is a plugin** (`plugins/dotclaude/`) shipping hooks, agents, and skills. It installs from this repo (which doubles as the marketplace), updates natively, is namespaced (`/dotclaude:*`), and is never written into the project tree.
+2. **The project-local layer is templates plus an `init` skill.** `/dotclaude:init` runs a deterministic sync engine that scaffolds the things a plugin can't carry: base rules, a settings baseline, a `CLAUDE.md` block, an `AGENTS.md`, Copilot instructions, and the GitHub AI-review workflows.
 
 ### Claude rules are the single source for Copilot too
 
-The Claude rules and GitHub Copilot's custom instructions cover the same ground, so dotclaude **generates the Copilot files from the rules** rather than maintaining two copies that drift:
+The Claude rules and GitHub Copilot's custom instructions cover the same ground. Rather than maintain two copies that drift apart, dotclaude **generates the Copilot files from the rules**:
 
 | dotclaude source | Generated Copilot artifact |
 |---|---|
@@ -33,12 +33,12 @@ The Claude rules and GitHub Copilot's custom instructions cover the same ground,
 | plugin reviewer agents | `.github/agents/<name>.md` (Copilot custom agents) |
 | (cross-tool pointer) | `AGENTS.md` |
 
-Copilot's 2026 surface mirrors Claude Code's (instructions, prompt files ≈ skills, custom agents ≈ subagents, and `.github/hooks/*.json` ≈ hooks). dotclaude generates the first four from one source — edit the rule/skill/agent in dotclaude, re-run `/dotclaude:init`, and the Copilot files regenerate. They carry the `dotclaude:managed` marker so the ownership model applies. **Hooks are deliberately not mirrored**: Copilot's hook I/O contract differs (camelCase events, `toolArgs`, JSON-output decisions vs exit-2), and Copilot's coding agent already has the org firewall/allowlist + branch protection + the AI-review workflows; mirroring hooks would be a second ecosystem to maintain for little marginal safety. Revisit if Copilot hooks leave preview and the contract stabilizes.
+Copilot's 2026 surface mirrors Claude Code's: instructions, prompt files (≈ skills), custom agents (≈ subagents), and `.github/hooks/*.json` (≈ hooks). dotclaude generates the first four from one source — edit a rule, skill, or agent in dotclaude, re-run `/dotclaude:init`, and the Copilot files regenerate. They carry the `dotclaude:managed` marker, so the ownership model applies. **Hooks are deliberately not mirrored.** Copilot's hook I/O contract differs (camelCase events, `toolArgs`, JSON-output decisions instead of exit-2), and Copilot's coding agent already has the org firewall/allowlist, branch protection, and the AI-review workflows. Mirroring hooks would mean maintaining a second ecosystem for little added safety. Revisit this once Copilot hooks leave preview and the contract stabilizes.
 
 ### Skills, agents, plans
 
-- **Skills / agents** are already two-layered: generic ones ship in the plugin (namespaced `/dotclaude:*`, `@agent`); project-specific ones live in the repo's `.claude/skills` and `.claude/agents` (short names, never touched by dotclaude).
-- **Plans**: generic, reusable playbooks live in the plugin (`templates/plans/`). Project-specific plans live in the repo's `.claude/plans/`, which `/dotclaude:init` adds to `.gitignore` — local working docs, not committed.
+- **Skills and agents** are already two-layered: generic ones ship in the plugin (namespaced `/dotclaude:*` and `@agent`), while project-specific ones live in the repo's `.claude/skills` and `.claude/agents` (short names, never touched by dotclaude).
+- **Plans**: generic, reusable playbooks live in the plugin (`templates/plans/`). Project-specific plans live in the repo's `.claude/plans/`, which `/dotclaude:init` adds to `.gitignore` — they're local working docs, not committed.
 
 ## The no-clash ownership model
 
@@ -50,9 +50,9 @@ Copilot's 2026 surface mirrors Claude Code's (instructions, prompt files ≈ ski
 
 Merge rules enforced by `skills/dotclaude-init/sync.py`:
 
-- **rules / workflows**: a managed file carries a `dotclaude:managed` marker. Sync overwrites only marked files. Delete the marker to take local ownership → sync reports `skip-own` and never touches it. Unmarked files are yours from the start.
-- **settings.json**: additive deep-merge. Base `allow`/`deny` and the marketplace/plugin wiring are ensured present; arrays are unioned, your scalars win, nothing is removed.
-- **CLAUDE.md**: only content between `<!-- dotclaude:begin -->` / `<!-- dotclaude:end -->` is replaced.
+- **rules / workflows**: a managed file carries a `dotclaude:managed` marker, and sync overwrites only marked files. Delete the marker to take local ownership — sync then reports `skip-own` and never touches it. Unmarked files are yours from the start.
+- **settings.json**: an additive deep-merge. The base `allow`/`deny` lists and the marketplace/plugin wiring are kept present; arrays are unioned, your scalars win, and nothing is removed.
+- **CLAUDE.md**: only the content between `<!-- dotclaude:begin -->` and `<!-- dotclaude:end -->` is replaced.
 
 ## Repo layout
 
@@ -77,14 +77,14 @@ dotclaude/
 
 ## dotgithub decision
 
-The `.github/` AI-review workflows live **in this same repo** under `plugins/dotclaude/templates/github/`, not in a separate repo. Rationale: one source of truth and atomic versioning of the whole AI dev environment; the same `/dotclaude:init` that scaffolds rules/settings also installs the workflows. A separate repo would only add coordination overhead for no benefit at this scale.
+The `.github/` AI-review workflows live **in this same repo** under `plugins/dotclaude/templates/github/`, not in a separate one. This keeps a single source of truth and versions the whole AI dev environment atomically: the same `/dotclaude:init` that scaffolds rules and settings also installs the workflows. A separate repo would only add coordination overhead with no payoff at this scale.
 
 The GitHub-side content is really two kinds:
 
-1. **Derived** — `.github/copilot-instructions.md`, `.github/instructions/*`, `AGENTS.md` are *generated from `.claude/rules/`* (single source, so Claude and Copilot can't drift). This part is intrinsic to dotclaude and must never be split out — separating it would force either duplicated rules or a cross-repo dependency.
-2. **Independent automation** — the AI-review workflows (`claude`, `codex`, `claude-code-review`) don't depend on the rules and *could* live apart, but at 3 small files they don't justify a second repo, install path, or version coordination.
+1. **Derived** — `.github/copilot-instructions.md`, `.github/instructions/*`, and `AGENTS.md` are *generated from `.claude/rules/`* (a single source, so Claude and Copilot can't drift). This part is intrinsic to dotclaude and must never be split out; separating it would force either duplicated rules or a cross-repo dependency.
+2. **Independent automation** — the AI-review workflows (`claude`, `codex`, `claude-code-review`) don't depend on the rules and *could* live elsewhere, but at three small files they don't justify a second repo, install path, or version coordination.
 
-**When to split:** not "should GitHub stuff be separate" but "has the workflow automation grown into a library?" (many composite actions, org-wide pipelines, several repos needing identical CI). If so, the right form is **not** a templates-copied-by-init repo — it's GitHub-native sharing: an **org-level `.github` repo** and/or **reusable workflows** (`uses: 8408323/dotgithub/.github/workflows/x.yml@ref`). Until then: derived content stays in dotclaude forever; workflow automation stays here too until it outgrows a handful of files, then graduates.
+**When to split:** the real question isn't "should the GitHub stuff be separate" but "has the workflow automation grown into a library?" — many composite actions, org-wide pipelines, several repos needing identical CI. If it has, the right form is **not** a templates-copied-by-init repo; it's GitHub-native sharing: an **org-level `.github` repo** and/or **reusable workflows** (`uses: 8408323/dotgithub/.github/workflows/x.yml@ref`). Until then, the derived content stays in dotclaude permanently, and the workflow automation stays here too until it outgrows a handful of files, then graduates.
 
 ## CI/CD
 
@@ -103,4 +103,4 @@ The GitHub-side content is really two kinds:
 /dotclaude:init            # scaffolds the project-local layer
 ```
 
-Or, since `/dotclaude:init` writes `extraKnownMarketplaces` + `enabledPlugins` into the project's `.claude/settings.json`, committing that file makes teammates get prompted to install on folder-trust.
+Since `/dotclaude:init` also writes `extraKnownMarketplaces` and `enabledPlugins` into the project's `.claude/settings.json`, committing that file means teammates are prompted to install when they trust the folder.

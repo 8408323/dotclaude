@@ -1,5 +1,5 @@
 {
-  "name": "block .env file",
+  "name": "Blocks editing a .env file",
   "stdin": { "tool_input": { "file_path": ".env" } },
   "expect_exit": 2,
   "expect_stdout_contains": ["deny"]

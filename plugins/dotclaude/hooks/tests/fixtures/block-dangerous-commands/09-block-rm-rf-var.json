@@ -1,5 +1,5 @@
 {
-  "name": "block rm -rf $VAR (unknown-expansion conservative block)",
+  "name": "Blocks rm -rf of an unknown variable expansion",
   "stdin": { "tool_input": { "command": "rm -rf $TRASH" } },
   "expect_exit": 2
 }
