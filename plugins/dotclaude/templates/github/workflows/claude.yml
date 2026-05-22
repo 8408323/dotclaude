@@ -40,9 +40,7 @@ jobs:
         with:
           fetch-depth: 1
 
-      - name: Run Claude Code (Jonathan Haraldsson)
-        id: claude
-        continue-on-error: true
+      - name: Run Claude Code
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
@@ -58,12 +56,4 @@ jobs:
           # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
           # or https://code.claude.com/docs/en/cli-reference for available options
           # claude_args: '--allowed-tools Bash(gh pr *)'
-
-      - name: Run Claude Code (j.haraldsson94@gmail.com fallback)
-        if: steps.claude.outcome == 'failure'
-        uses: anthropics/claude-code-action@v1
-        with:
-          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN_JH }}
-          additional_permissions: |
-            actions: read
 

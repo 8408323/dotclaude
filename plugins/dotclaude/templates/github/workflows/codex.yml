@@ -33,7 +33,7 @@ jobs:
       pull-requests: read
       issues: read
     outputs:
-      final_message: ${{ steps.run_codex.outputs['final-message'] || steps.run_codex_fallback.outputs['final-message'] }}
+      final_message: ${{ steps.run_codex.outputs['final-message'] }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -52,21 +52,11 @@ jobs:
             printf '%s' "$ISSUE_COMMENT_BODY" > /tmp/codex_prompt.txt
           fi
 
-      - name: Run Codex (Jonathan Haraldsson)
+      - name: Run Codex
         id: run_codex
-        continue-on-error: true
         uses: openai/codex-action@v1
         with:
           openai-api-key: ${{ secrets.OPENAI_API_KEY }}
-          sandbox: read-only
-          prompt-file: /tmp/codex_prompt.txt
-
-      - name: Run Codex (j.haraldsson94@gmail.com fallback)
-        id: run_codex_fallback
-        if: steps.run_codex.outcome == 'failure'
-        uses: openai/codex-action@v1
-        with:
-          openai-api-key: ${{ secrets.OPENAI_API_KEY_JH }}
           sandbox: read-only
           prompt-file: /tmp/codex_prompt.txt
 

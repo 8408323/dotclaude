@@ -48,6 +48,6 @@ Copilot instructions and `.github/instructions/*` are **derived from `.claude/ru
 1. Confirm you're at the intended project root.
 2. Run with `--dry-run` first and show the user the report.
 3. If it looks right, run for real. Then remind the user to delete rule files that don't fit their stack (e.g. `frontend.md` and `database.md` for a backend-only project) and to adjust the `paths:` globs in `security.md` and `error-handling.md`. (Adjusting a rule's `paths:` automatically updates its generated `applyTo`.)
-4. The GitHub workflows need repo secrets (`CLAUDE_CODE_OAUTH_TOKEN`, and optionally `OPENAI_API_KEY` plus the `_JH` fallbacks). Mention this, but don't attempt to set secrets yourself.
+4. The GitHub workflows need repo secrets (`CLAUDE_CODE_OAUTH_TOKEN`, and optionally `OPENAI_API_KEY` for the Codex workflow). Mention this, but don't attempt to set secrets yourself.
 
 After a real run, tell the user to run `/reload-plugins` (or restart) so the new rules and settings load.
